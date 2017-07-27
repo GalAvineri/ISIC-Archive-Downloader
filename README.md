@@ -1,5 +1,5 @@
 # ISIC Archive Downloader
-The ISIC Archive contains over 13k images of skin lesions, labeled as 'benign' or 'malignant'
+The ISIC Archive contains over 13k images of skin lesions, labeled as 'benign' or 'malignant'.
 The archive can be found here:
 https://isic-archive.com/#images
 
@@ -12,7 +12,7 @@ are the following:
 
 The first option didn't seem feasible to us,
 and we had problems with the second option.
-The direct download in the third option never downloaded successfully.
+The direct download in the third option never finished the downloaded successfully and always failed during the process.
 
 We figured the direct download (which is the easiest and most comfortable way)
 didn't work because the file was too big and if there is a connection problem
