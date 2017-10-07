@@ -41,9 +41,12 @@ as the ISIC foundation wishes :)
 
 # Instructions
 1. download or clone the repository
-2. Open the download_database.py file, and update the size parameter according to the updated
-   size of the database.
-3. run download.py
+2. Open the download_database.py file, and update the required parameter
+   size: the number of images in the isic archive database
+3. (optional) change the default location of the directory the images and their discription will be saved.
+You can also change the default amount of images each thread will download (thread_subset_size)
+but i don't think it's worth any bothering.
+4. run download.py
 
 # Notes
 1. We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
