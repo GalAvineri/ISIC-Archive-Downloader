@@ -9,12 +9,12 @@ from os.path import abspath, join
 # Required Parameters:
 # Specify the current dataset size
 size = 13786
-# specify the path to the dir the images will be saved in
-images_dir = abspath(join(os.pardir, 'images'))
-# specify the path to the dir the descriptions will be saved in
-descs_dir = abspath(join(os.pardir, 'descriptions'))
 
 # Optional parameters:
+# Specify the path to the dir the images will be saved in
+images_dir = abspath(join(os.pardir, 'images'))
+# Specify the path to the dir the descriptions will be saved in
+descs_dir = abspath(join(os.pardir, 'descriptions'))
 # Choose the number of images each thread will download
 thread_subset_size = 30
 
