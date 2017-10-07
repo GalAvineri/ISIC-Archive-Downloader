@@ -67,7 +67,7 @@ def parse_desc(desc):
 
     while line_end_index < len(desc):
         if desc[line_end_index:line_end_index+2] == '},':
-            line = desc[line_start_index: line_end_index]
+            line = desc[line_start_index: line_end_index + 2]
             # indent the line
             line = ' ' * indentation + line
             lines.append(line)
