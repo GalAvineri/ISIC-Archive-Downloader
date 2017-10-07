@@ -46,7 +46,7 @@ as the ISIC foundation wishes :)
 3. (optional) change the default location of the directory the images and their discription will be saved.
 You can also change the default amount of images each thread will download (thread_subset_size)
 but i don't think it's worth any bothering.
-4. run download.py
+4. run download_dataset.py
 
 # Notes
 1. We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
