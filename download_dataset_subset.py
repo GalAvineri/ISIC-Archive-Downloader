@@ -1,6 +1,7 @@
 import os
 import shutil
 import time
+import json
 import requests
 
 
@@ -23,7 +24,7 @@ def download_dataset_subset(start, end, id_file_path, images_dir, descs_dir, thr
             # Update the index to the right offset of the bin we're working on
             index = index + start
 
-            print("downloading image ({0}/{1})".format(index, end))
+            print("downloading image ({0} / {1} / {2})".format(start, index, end-1))
             # strip the id from the \n at the end
             id = id.strip()
 
@@ -39,24 +40,28 @@ def download_dataset_subset(start, end, id_file_path, images_dir, descs_dir, thr
             succeeded = False
             while not succeeded:
                 try:
-                    response_image = requests.get(url_image, stream=True)
-                    response_desc = requests.get(url_desc, stream=True)
+                    response_image = requests.get(url_image, stream=True, timeout=20)
+                    response_desc = requests.get(url_desc, stream=True, timeout=20)
+                    response_image.raise_for_status()
+                    response_desc.raise_for_status()
+
+                    # Write the image into a file
+                    img_path = os.path.join(images_dir, 'ISIC_{0}.jpg'.format(str(index).zfill(7)))
+                    with open(img_path, 'wb') as imageFile:
+                        shutil.copyfileobj(response_image.raw, imageFile)
+
+                    # Parse the description and write the description into a file
+                    parsed_desc = response_desc.json()
+                    desc_path = os.path.join(descs_dir, 'ISIC_{0}'.format(str(index).zfill(7)))
+                    with open(desc_path, 'w') as descFile:
+                        json.dump(parsed_desc, descFile, indent=2)
+
                     succeeded = True
                 except:
-                    print "trying again index number ", index
-                    time.sleep(5)
+                    print "trying again image number ", index
+                    time.sleep(20)
 
-            # Write the image into a file
-            imgFilePath = os.path.join(images_dir, 'ISIC_{0}.jpg'.format(str(index).zfill(7)))
-            with open(imgFilePath, 'wb') as imageFile:
-                shutil.copyfileobj(response_image.raw, imageFile)
 
-            # Parse the description and write the description into a file
-            parsed_desc = parse_desc(response_desc.content)
-            descFilePath = os.path.join(descs_dir, 'ISIC_{0}'.format(str(index).zfill(7)))
-            with open(descFilePath, 'w') as descFile:
-                for line in parsed_desc:
-                    descFile.write("%s\n" % line)
 
     print('Thread {0} finished'.format(thread_id))
 

@@ -16,7 +16,7 @@ images_dir = join(os.pardir, 'Data', 'images')
 # Specify the path to the dir the descriptions will be saved in
 descs_dir = join(os.pardir, 'Data', 'descriptions')
 # Choose the number of images each thread will download
-thread_subset_size = 30
+thread_subset_size = 300
 
 
 def get_ids():
@@ -54,9 +54,9 @@ def download_dataset():
     threads = []
     for idx, left_edge in enumerate(bins):
         # Deretmine the right edge
-        right_edge = left_edge + thread_subset_size - 1
-        if right_edge >= size - 1:
-            right_edge = size - 1
+        right_edge = left_edge + thread_subset_size
+        if right_edge >= size:
+            right_edge = size
         # Define the thread on the current subset
         thread = Thread(target=download_dataset_subset, kwargs={'start': left_edge, 'end': right_edge, 'id_file_path': id_file_path,
                                                                 'images_dir': images_dir, 'descs_dir': descs_dir, 'thread_id': idx})
