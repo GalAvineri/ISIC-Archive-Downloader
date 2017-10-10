@@ -58,6 +58,8 @@ def download_dataset_subset(start, end, id_file_path, images_dir, descs_dir, thr
                 for line in parsed_desc:
                     descFile.write("%s\n" % line)
 
+    print('Thread {0} finished'.format(thread_id))
+
 
 def parse_desc(desc):
     line_start_index = 0
