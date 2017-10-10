@@ -61,8 +61,6 @@ def download_dataset_subset(start, end, id_file_path, images_dir, descs_dir, thr
                     print "trying again image number ", index
                     time.sleep(20)
 
-
-
     print('Thread {0} finished'.format(thread_id))
 
 
