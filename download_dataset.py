@@ -12,9 +12,9 @@ size = 13786
 
 # Optional parameters:
 # Specify the path to the dir the images will be saved in
-images_dir = abspath(join(os.pardir, 'images'))
+images_dir = join(os.pardir, 'Data', 'images')
 # Specify the path to the dir the descriptions will be saved in
-descs_dir = abspath(join(os.pardir, 'descriptions'))
+descs_dir = join(os.pardir, 'Data', 'descriptions')
 # Choose the number of images each thread will download
 thread_subset_size = 30
 
@@ -67,7 +67,6 @@ def download_dataset():
     # Wait for all the threads to finish
     for thread in threads:
         thread.join()
-        print('Thread {0} finished'.format(thread._Thread__kwargs['thread_id']))
 
     print('All threads have finished')
 
