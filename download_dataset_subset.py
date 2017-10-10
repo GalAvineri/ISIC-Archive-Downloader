@@ -2,6 +2,7 @@ import os
 import shutil
 import time
 import requests
+import json
 
 
 def download_dataset_subset(start, end, id_file_path, images_dir, descs_dir, thread_id):
@@ -52,50 +53,9 @@ def download_dataset_subset(start, end, id_file_path, images_dir, descs_dir, thr
                 shutil.copyfileobj(response_image.raw, imageFile)
 
             # Parse the description and write the description into a file
-            parsed_desc = parse_desc(response_desc.content)
+            parsed_desc = response_desc.json()
             descFilePath = os.path.join(descs_dir, 'ISIC_{0}'.format(str(index).zfill(7)))
             with open(descFilePath, 'w') as descFile:
-                for line in parsed_desc:
-                    descFile.write("%s\n" % line)
+                json.dump(parsed_desc, descFile,indent=2)
 
     print('Thread {0} finished'.format(thread_id))
-
-
-def parse_desc(desc):
-    line_start_index = 0
-    line_end_index = 0
-    lines = []
-    indentation = 0
-
-    while line_end_index < len(desc):
-        if desc[line_end_index:line_end_index+2] == '},':
-            line = desc[line_start_index: line_end_index + 2]
-            # indent the line
-            line = ' ' * indentation + line
-            lines.append(line)
-            line_start_index = line_end_index + 2
-            line_end_index = line_start_index
-            # update indentation
-            indentation -= 4
-
-        elif desc[line_end_index] in ['{', '}', ',', '[', ']']:
-            line = desc[line_start_index: line_end_index + 1]
-            # indent the line
-            line = ' '*indentation + line
-            lines.append(line)
-
-            # update indentation
-            if desc[line_end_index] in ['{', '[']:
-                indentation += 4
-            elif desc[line_end_index] in ['}', ']']:
-                indentation -= 4
-
-            # update pointers
-            line_start_index = line_end_index + 1
-            line_end_index = line_start_index
-
-        else:
-            line_end_index += 1
-
-    return lines
-
