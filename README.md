@@ -41,16 +41,16 @@ as the ISIC foundation wishes :)
 
 # Instructions
 1. download or clone the repository
-2. Open the download_database.py file, and update the required size parameter
+2. Open download_database.py and update the size parameter
    which is the number of images in the isic archive database
-3. (optional) change the default location of the directory the images and their discription will be saved.
-You can also change the default amount of images each thread will download (thread_subset_size)
-but i don't think it's worth any bothering.
-4. run download_dataset.py
+3. (optional) change the default images_dir and descs_dir which are the paths to the directories where the images and their descriptions will be downloaded.
+   In addition you can also change the default amount of images each thread will download (thread_subset_size)
+   but i don't think it's worth any bothering.
+4. run download_dataset.py using '''python download_dataset.py'''
 
 # Notes
 1. We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
-   If the prefix or suffix ever change - let us know and we will change it accordingly! :)
+   If the prefix or suffix ever change - let us know and we will change it accordingly!
    You can let us know in the issues tab :)
 
 2. After first downloading the dataset we had a few images that haven't downloaded properly 
@@ -58,9 +58,8 @@ but i don't think it's worth any bothering.
    We were not sure what was the cause of this, our guess is that there were
    internet connection problems during the download of these images.
    In any case - I would advise you to swiftly go through the images and validate
-   that non of them are partially or entirely black (which suggests of corruption of the image)
-   In case you experience the problem as well and find a problem with the code to be at fault
-   please raise an issue at the issues tab and let us know :)
+   that non of them are partially or entirely black (which suggests of corruption of the image).
+   In case you experience the problem, please let us know and we will try to track down the issue :)
 
 
 # Finally: 
