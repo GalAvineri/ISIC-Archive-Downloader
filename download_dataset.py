@@ -1,10 +1,11 @@
 from download_dataset_subset import download_dataset_subset
+import re
+import os
 import shutil
 import requests
-import os
+from os.path import join
 from threading import Thread
-import re
-from os.path import abspath, join
+
 
 # Required Parameters:
 # Specify the current dataset size
@@ -12,14 +13,39 @@ size = 13786
 
 # Optional parameters:
 # Specify the path to the dir the images will be saved in
-images_dir = join(os.pardir, 'Data', 'images')
+images_dir = join('Data', 'images')
 # Specify the path to the dir the descriptions will be saved in
-descs_dir = join(os.pardir, 'Data', 'descriptions')
+descs_dir = join('Data', 'descriptions')
 # Choose the number of images each thread will download
 thread_subset_size = 300
 
 
-def get_ids():
+def main():
+
+    # Specify the path to the temporary text file which will hold the images ids
+    id_file_path = os.path.join(os.getcwd(), 'ids.txt')
+
+    # If any of the images dir, descs dir or ids file exists - remove them so we won't override data
+    # and perhaps create corrupted data
+    if os.path.isdir(images_dir):
+        shutil.rmtree(images_dir)
+    if os.path.isdir(descs_dir):
+        shutil.rmtree(descs_dir)
+    if os.path.isfile(id_file_path):
+        os.remove(id_file_path)
+    os.makedirs(images_dir)
+    os.makedirs(descs_dir)
+
+    # 1. Get the ids of all the images into a txt file
+    get_ids(id_file_path)
+    # 2. Download all the images using their ids
+    download_dataset(id_file_path)
+    # 3. Cleanup
+    os.remove(id_file_path)
+
+
+def get_ids(id_file_path):
+
     print('Collecting all images ids')
 
     # Specify the url that lists the meta data about the images (id, name, etc..)
@@ -45,7 +71,7 @@ def extract_id_from_line(s, index):
     return id
 
 
-def download_dataset():
+def download_dataset(id_file_path):
     # Determine the dataset subsets which multiple threads will download
     bins = range(0, size, thread_subset_size)
 
@@ -70,27 +96,6 @@ def download_dataset():
 
     print('All threads have finished')
 
-# Main
 
-# the path to the temporary text file which will hold the images ids
-id_file_path = os.path.join(os.getcwd(), 'ids.txt')
-
-# If any of the images dir, descs dir or ids file exists - remove them so we won't override data
-# and perhaps create corrupted data
-if os.path.isdir(images_dir):
-    shutil.rmtree(images_dir)
-if os.path.isdir(descs_dir):
-    shutil.rmtree(descs_dir)
-if os.path.isfile(id_file_path):
-    os.remove(id_file_path)
-os.mkdir(images_dir)
-os.mkdir(descs_dir)
-
-
-# 1. Get the ids of all the images into a txt file
-get_ids()
-# 2. Download all the images using their ids
-download_dataset()
-# 3. Cleanup
-os.remove(id_file_path)
-
+if __name__ == '__main__':
+    main()
