@@ -16,14 +16,16 @@ The direct download in the third option never finished the downloaded successful
 
 We figured the direct download (which is the easiest and most comfortable way)
 didn't work because the file was too big and if there is a connection problem
-somewhere along the download process, the downloading process is stopped and isn't resumed.
+somewhere along the download process, the downloading process was stopped and hasn't resumed.
 
 So instead of downloading the entire dataset at once, you could filter the images
-to different sub-datasets using the filters on the site, and download each of the sub-datasets.
+to different sub-datasets using the filters on the website, and download each of the sub-datasets.
 
-If you find this way too tidious, we suggest of another way:
-We made a script that download the entier dataset automatically.
-Here i'll explain the process:
+If you find the options above too laborious or unavailable like us, our script can help you.
+We made a script that downloads the entire dataset automatically.
+
+Here i'll explain the way the automatic download is available.
+If you'd like, you can just skip to the instructions part and move on to download the dataset.
 
 Searching for a few images using the Grider api, we found that the images are stored
 at a url which is in the template of 'url_base_prefix + image_id + 'url_base_suffix
@@ -50,7 +52,7 @@ as the ISIC foundation wishes :)
 
 # Note
    We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
-   If the prefix or suffix ever change - let us know and we will change it accordingly!
+   If the prefix or suffix ever change (and you start getting errors for example) - let us know and we will change it accordingly!
    You can let us know in the issues tab :)
 
 
