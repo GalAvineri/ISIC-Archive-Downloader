@@ -16,16 +16,15 @@ def download_dataset_subset(start, end, ids, images_dir, descs_dir, thread_id):
     base_url_prefix = 'https://isic-archive.com/api/v1/image/'
     base_url_suffix = '/download?contentDisposition=inline'
 
-    # for each id:
+    # For each id:
     # 1. get the corresponding image and description urls
     # 2. download the image and the description from the urls
     for id, index in zip(ids, range(start, end)):
-
         print("downloading image ({0} / {1} / {2})".format(start, index, end-1))
 
-        # get the corresponding image url
+        # Get the corresponding image url
         url_image = base_url_prefix + id + base_url_suffix
-        # get the corresponding description url
+        # Get the corresponding description url
         url_desc = base_url_prefix + id
         print ("url_image = {0}".format(url_image))
 

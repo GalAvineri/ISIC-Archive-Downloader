@@ -22,7 +22,6 @@ thread_subset_size = 300
 
 
 def main():
-
     # If any of the images dir, descs dir or ids file exists - remove them so we won't override data
     # and perhaps create corrupted data
     create_or_recreate_dir(images_dir)
@@ -37,7 +36,6 @@ def main():
 
 
 def get_ids():
-
     print('Collecting all images ids')
 
     # Specify the url that lists the meta data about the images (id, name, etc..)
