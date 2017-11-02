@@ -48,7 +48,7 @@ as the ISIC foundation wishes :)
 3. (optional) change the default images_dir and descs_dir which are the paths to the directories where the images and their descriptions will be downloaded.
    In addition you can also change the default amount of images each thread will download (thread_subset_size)
    but i don't think it's worth any bothering.
-4. run download_dataset.py using '''python download_dataset.py'''
+4. run download_dataset.py using ```python download_dataset.py```
 
 # Note
    We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
