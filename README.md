@@ -28,8 +28,8 @@ Here i'll explain the way the automatic download is available.
 If you'd like, you can just skip to the instructions part and move on to download the dataset.
 
 Searching for a few images using the Grider api, we found that the images are stored
-at a url which is in the template of 'url_base_prefix + image_id + 'url_base_suffix
-and that their description are stored in 'url_base_prefix' + image_id
+at a url which is in the template of 'url_base_prefix + image_id + url_base_suffix'
+and that their description are stored in 'url_base_prefix' + image_id'
 
 So we wrote a script that, using the Grider API, found the ids of all the images
 and downloaded the images and their description from the corresponding urls
@@ -37,7 +37,7 @@ and downloaded the images and their description from the corresponding urls
 You are most welcome to use the script with the simple instructions found below :)
 
 We hope this script will allow researchers who had similliar difficulties
-accessing ISIC's Archive dataset and enable them to provide further work on this field, 
+accessing ISIC's Archive dataset to have easier access and enable them to provide further work on this field,
 as the ISIC foundation wishes :)
 
 
