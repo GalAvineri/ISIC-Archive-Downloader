@@ -31,8 +31,8 @@ def main():
     ids = get_ids()
     # 2. Download all the images using their ids
     download_dataset(ids)
-    # 3. Validate all the images
-    validate_images()
+
+    print('Finished downloading the dataset')
 
 
 def get_ids():
@@ -79,9 +79,15 @@ def download_dataset(ids):
 def validate_images():
     # We would like to check that all the images are valid
     try:
-        for image in os.listdir(images_dir):
+        for index, image in enumerate(os.listdir(images_dir)):
             image_path = join(images_dir, image)
             validate_image(image_path)
+
+            if (index + 1) % 100 == 0:
+                print('Validated {0} out of {1} images'.format(index + 1, size))
+
+        print('Finished validating the images')
+
     except IOError as e:
         print(e.message)
         print("The image {0} wasn't downloaded successfully. "
