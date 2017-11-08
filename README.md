@@ -25,8 +25,8 @@ If you find the options above too laborious or unavailable like us, our script c
 We made a script that downloads the entire dataset automatically.
 
 # Requirements
-1. requests - ```pip install requests```
-2. PIL      - ```pip install Pillow```
+1. requests  ```pip install requests```
+2. PIL  ```pip install Pillow```
 
 # Instructions
 1. download or clone the repository
