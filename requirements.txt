@@ -1,2 +1,2 @@
-requrests
-image
+requests
+Pillow

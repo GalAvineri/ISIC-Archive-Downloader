@@ -24,22 +24,9 @@ to different sub-datasets using the filters on the website, and download each of
 If you find the options above too laborious or unavailable like us, our script can help you.
 We made a script that downloads the entire dataset automatically.
 
-Here i'll explain the way the automatic download is available.
-If you'd like, you can just skip to the instructions part and move on to download the dataset.
-
-Searching for a few images using the Grider api, we found that the images are stored
-at a url which is in the template of 'url_base_prefix + image_id + url_base_suffix'
-and that their description are stored in 'url_base_prefix' + image_id'
-
-So we wrote a script that, using the Grider API, found the ids of all the images
-and downloaded the images and their description from the corresponding urls
-
-You are most welcome to use the script with the simple instructions found below :)
-
-We hope this script will allow researchers who had similliar difficulties
-accessing ISIC's Archive dataset to have easier access and enable them to provide further work on this field,
-as the ISIC foundation wishes :)
-
+# Requirements
+1. requests - ```pip install requests```
+2. PIL      - ```pip install Pillow```
 
 # Instructions
 1. download or clone the repository
@@ -50,13 +37,29 @@ as the ISIC foundation wishes :)
    but i don't think it's worth any bothering.
 4. run download_dataset.py using ```python download_dataset.py```
 
+# How does it work
+Here i'll explain the way the automatic download is working.
+
+Searching for a few images using the Grider api, we found that the images are stored
+at a url which is in the template of 'url_base_prefix + image_id + url_base_suffix'
+and that their description are stored in 'url_base_prefix' + image_id'
+
+The Grider API also provides a way to request all the ids of all the images at once.
+
+So we wrote a script that, using the Grider API, requests the ids of all the images
+and downloaded the images and their description from the corresponding urls.
+
 # Note
    We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
    If the prefix or suffix ever change (and you start getting errors for example) - let us know and we will change it accordingly!
    You can let us know in the issues tab :)
 
 
-# Finally: 
+# Finally:
+We hope this script will allow researchers who had similliar difficulties
+accessing ISIC's Archive dataset to have easier access and enable them to provide further work on this field,
+as the ISIC foundation wishes :)
+
 If you stumble into any issues - let us know in the issues section!
 
 In addition, Any contributions of improvements to our code that will improve the comfort of the users 
