@@ -1,4 +1,5 @@
-from download_dataset_subset import download_dataset_subset, validate_image
+from download_dataset_subset import download_dataset_subset
+from progress_bar import progress_bar
 
 import argparse
 import os
@@ -49,19 +50,25 @@ def download_dataset(ids, num_images, images_dir, descs_dir, thread_subset_size)
     bin_starts = bins[:-1]
     bin_ends = bins[1:]
 
+    # Create a thread to provide a progress bar
+    prog_thread = Thread(target=progress_bar, kwargs={'target': num_images, 'dir': descs_dir})
+    prog_thread.start()
+
     # Create threads to download each data subset
-    threads = []
-    for idx, bin_start, bin_end in enumerate(zip(bin_starts, bin_ends)):
-        thread = Thread(target=download_dataset_subset, kwargs={'start': bin_start, 'end': bin_end, 'ids': ids[bin_start: bin_end],
-                                                                'images_dir': images_dir, 'descs_dir': descs_dir, 'thread_id': idx})
-        thread.start()
-        threads.append(thread)
+    data_threads = []
+    for idx, (bin_start, bin_end) in enumerate(zip(bin_starts, bin_ends)):
+        data_thread = Thread(target=download_dataset_subset, kwargs={'start': bin_start, 'end': bin_end,
+                                                                     'ids': ids[bin_start: bin_end],
+                                                                     'images_dir': images_dir,
+                                                                     'descs_dir': descs_dir})
+        data_thread.start()
+        data_threads.append(data_thread)
 
-    # Wait for all the threads to finish
-    for thread in threads:
+    # Wait for all the data threads to finish
+    for thread in data_threads:
         thread.join()
-
-    print('All threads have finished')
+    # Wait for the progress bar thread finish
+    prog_thread.join()
 
 
 if __name__ == '__main__':
