@@ -1,58 +1,63 @@
 # ISIC Archive Downloader
-The ISIC Archive contains over 13k images of skin lesions, labeled as 'benign' or 'malignant'.
+The ISIC Archive contains over 13k images of skin lesions, labeled as 'benign' or 'malignant'.  
 The archive can be found here:
 https://isic-archive.com/#images
 
-The current ways to download the database, provided by the ISIC foundation, which are known to me
-are the following:
-1. Downloading the images one by one via the Grider API provided in the site
-2. Downloading the database using their isic-archive repository in github: 
-   https://github.com/ImageMarkup/isic-archive
-3. Download the database via the direct download button on their site.
+The current ways to download the archive, provided by the ISIC foundation and which are known to me, are the following:
+1. Download the entire archive via the direct download button on their website.
+2. Download all the partitions of the archive, called 'datasets' one by one
+3. Downloading the images one by one via the Grider API provided in the site
 
-The first option didn't seem feasible to us,
-and we had problems with the second option.
-The direct download in the third option never finished the downloaded successfully and always failed during the process.
 
-We figured the direct download (which is the easiest and most comfortable way)
-didn't work because the file was too big and if there is a connection problem
-somewhere along the download process, the downloading process was stopped and hasn't resumed.
+The first option (which is the easiest and most comfortable way) doesn't always work for some reason.  
+The download doesn't always finish successfully and sometimes fails along the way.  
+we suspect this is happening due to the large file size.
+  
+The second option seems rather good if you plan to download the archive a only few times
+and the third option seems unfeasible.  
 
-So instead of downloading the entire dataset at once, you could filter the images
-to different sub-datasets using the filters on the website, and download each of the sub-datasets.
-
-If you find the options above too laborious or unavailable like us, our script can help you.
-We made a script that downloads the entire dataset automatically.
+If you find the options above too laborious or unavailable, our script provides an comfortable alternative.  
+We made a comfortable script that downloads the entire archive automatically.
 
 # Requirements
-1. requests  ```pip install requests```
-2. PIL  ```pip install Pillow```
+1.  requests  `pip install requests`
+2.  PIL  `pip install Pillow`
+3.  progressbar2  `pip install progressbar2`
+
+Or you could just `pip install -r requirements.txt`
 
 # Instructions
-1. download or clone the repository
-2. Open download_dataset.py and update the size parameter
-   which is the number of images in the isic archive database
-3. (optional) change the default images_dir and descs_dir which are the paths to the directories where the images and their descriptions will be downloaded.
-   In addition you can also change the default amount of images each thread will download (thread_subset_size)
-   but i don't think it's worth any bothering.
-4. run download_dataset.py using ```python download_dataset.py```
+1.  download or clone the repository
+2.  run download_dataset.py with the number of images currently available in the ISIC Archive  
+    e.g `python download_dataset 13000`  
+    
+(optional)  
+You can change the default directories which the images and their descriptions will be downloaded to.  
+`python download_dataset 13000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
+  
+You can also change the default amount of images each thread will download
+``python download_dataset 13000 -tss 300``  
+but i don't think it's worth any bothering
 
 # How does it work
-Here i'll explain the way the automatic download is working.
+Here we'll explain the way the script is works.
 
-Searching for a few images using the Grider api, we found that the images are stored
-at a url which is in the template of 'url_base_prefix + image_id + url_base_suffix'
-and that their description are stored in 'url_base_prefix' + image_id'
+Searching for a few images using the API provided by the website, we found that the images are stored
+at a url which is in the template of \<prefix>  \<image id>  \<suffix>  
+and that their description are stored in \<prefix> \<image id>
 
-The Grider API also provides a way to request all the ids of all the images at once.
+The website API also provides a way to request all the ids of all the images.
 
-So we wrote a script that, using the Grider API, requests the ids of all the images
-and downloaded the images and their description from the corresponding urls.
+So we wrote a script that:
+1. Requests the ids of all the images
+2. Builds the urls by the given template
+3. Downloads the images and descriptions from the built urls 
 
 # Note
-   We assume that the images and descriptions have a specific url prefix and suffix as mentioned above.
-   If the prefix or suffix ever change (and you start getting errors for example) - let us know and we will change it accordingly!
-   You can let us know in the issues tab :)
+As mentioned above, we assume that the urls of the images and descriptions are built by a certain template.  
+If the template ever changes (and you start getting errors for example)  
+just let us know and we will change it accordingly :)  
+Feel free to use the issues tab for that.
 
 
 # Finally:
@@ -62,7 +67,7 @@ as the ISIC foundation wishes :)
 
 If you stumble into any issues - let us know in the issues section!
 
-In addition, Any contributions of improvements to our code that will improve the comfort of the users 
+In addition, Any contributions or improvements to our code that will improve the comfort of the users 
 will be dearly appreciated :)
 
 
