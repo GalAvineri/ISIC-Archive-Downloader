@@ -36,17 +36,18 @@ def download_dataset_subset(start, end, ids, images_dir, descs_dir):
                 response_image.raise_for_status()
                 response_desc.raise_for_status()
 
+                # Parse the description and write it into a file
+                parsed_desc = response_desc.json()
+
                 # Write the image into a file
-                img_path = join(images_dir, 'ISIC_{0}.jpg'.format(str(index).zfill(7)))
+                img_path = join(images_dir, '{0}.jpg'.format(parsed_desc['name']))
                 with open(img_path, 'wb') as imageFile:
                     shutil.copyfileobj(response_image.raw, imageFile)
 
                 # Validate the image was downloaded correctly
                 validate_image(img_path)
 
-                # Parse the description and write it into a file
-                parsed_desc = response_desc.json()
-                desc_path = join(descs_dir, 'ISIC_{0}'.format(str(index).zfill(7)))
+                desc_path = join(descs_dir, parsed_desc['name'])
                 with open(desc_path, 'w') as descFile:
                     json.dump(parsed_desc, descFile, indent=2)
 
