@@ -34,9 +34,9 @@ Or you could just `pip install -r requirements.txt`
     You can change the default directories which the images and their descriptions will be downloaded to.  
     `python download_dataset 13000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
       
-    You can also change the default amount of images each thread will download
+    You can also change the default amount of images each thread will download  
     ``python download_dataset 13000 -tss 300``  
-    but i don't think it's worth any bothering
+    but it might not be worth any bothering
 
 # How does it work
 Here we'll explain the way the script is works.
