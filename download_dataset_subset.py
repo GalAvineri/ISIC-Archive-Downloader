@@ -26,7 +26,7 @@ def download_dataset_subset(start, end, ids, images_dir, descs_dir, thread_id):
         url_image = base_url_prefix + id + base_url_suffix
         # Get the corresponding description url
         url_desc = base_url_prefix + id
-        print ("url_image = {0}".format(url_image))
+        print("url_image = {0}".format(url_image))
 
         # Download the image and desctiprion using the urls
         # Sometimes their site isn't responding well, and than an error occurs,

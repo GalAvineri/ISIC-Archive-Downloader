@@ -1,71 +1,59 @@
 from download_dataset_subset import download_dataset_subset, validate_image
-import re
+
+import argparse
 import os
 import shutil
 import requests
 from os.path import join
 from threading import Thread
-from PIL import Image
 
 
-# Required Parameters:
-# Specify the current dataset size
-size = 13786
-
-# Optional parameters:
-# Specify the path to the dir the images will be saved in
-images_dir = join(os.pardir, 'Data', 'Images')
-# Specify the path to the dir the descriptions will be saved in
-descs_dir = join(os.pardir, 'Data', 'Descriptions')
-# Choose the number of images each thread will download
-thread_subset_size = 300
-
-
-def main():
+def main(num_images, images_dir, descs_dir, thread_subset_size):
     # If any of the images dir, descs dir or ids file exists - remove them so we won't override data
     # and perhaps create corrupted data
     create_or_recreate_dir(images_dir)
     create_or_recreate_dir(descs_dir)
 
-    # 1. Get the ids of all the images
-    ids = get_ids()
-    # 2. Download all the images using their ids
-    download_dataset(ids)
+    print('Collecting the images ids')
+    ids = get_images_ids(num_images=num_images)
 
-    print('Finished downloading the dataset')
+    print('Downloading images and descriptions')
+    download_dataset(ids=ids, num_images=num_images, images_dir=images_dir, descs_dir=descs_dir,
+                     thread_subset_size=thread_subset_size)
+
+    print('Finished downloading the data set')
 
 
-def get_ids():
-    print('Collecting all images ids')
+def create_or_recreate_dir(dir_path):
+    if os.path.exists(dir_path):
+        shutil.rmtree(dir_path)
+    os.makedirs(dir_path)
 
+
+def get_images_ids(num_images):
     # Specify the url that lists the meta data about the images (id, name, etc..)
-    url = 'https://isic-archive.com/api/v1/image?limit={0}&offset=0&sort=name&sortdir=1'.format(size)
+    url = 'https://isic-archive.com/api/v1/image?limit={0}&offset=0&sort=name&sortdir=1'.format(num_images)
     # Get the images metadata
     response = requests.get(url, stream=True)
-    # Parse as json
+    # Parse the metadata
     meta_data = response.json()
-    # Extract all the ids
-    ids = [str(meta_data[index]['_id']) for index in range(size)]
-
+    # Extract the ids of the images
+    ids = [meta_data[index]['_id'] for index in range(num_images)]
     return ids
 
 
-def download_dataset(ids):
-    # Determine the dataset subsets which multiple threads will download
-    bins = range(0, size, thread_subset_size)
+def download_dataset(ids, num_images, images_dir, descs_dir, thread_subset_size):
+    # Split the data into subsets
+    bins = list(range(0, num_images, thread_subset_size))
+    bins.append(num_images)
+    bin_starts = bins[:-1]
+    bin_ends = bins[1:]
 
-    # Create the threads to download subsets of the dataset
-    # and determine the edges for the current thread
+    # Create threads to download each data subset
     threads = []
-    for idx, left_edge in enumerate(bins):
-        # Deretmine the right edge
-        right_edge = left_edge + thread_subset_size
-        if right_edge >= size:
-            right_edge = size
-        # Define the thread on the current subset
-        thread = Thread(target=download_dataset_subset, kwargs={'start': left_edge, 'end': right_edge, 'ids': ids[left_edge: right_edge],
+    for idx, bin_start, bin_end in enumerate(zip(bin_starts, bin_ends)):
+        thread = Thread(target=download_dataset_subset, kwargs={'start': bin_start, 'end': bin_end, 'ids': ids[bin_start: bin_end],
                                                                 'images_dir': images_dir, 'descs_dir': descs_dir, 'thread_id': idx})
-        # Start it and add it to the list of threads
         thread.start()
         threads.append(thread)
 
@@ -76,29 +64,16 @@ def download_dataset(ids):
     print('All threads have finished')
 
 
-def validate_images():
-    # We would like to check that all the images are valid
-    try:
-        for index, image in enumerate(os.listdir(images_dir)):
-            image_path = join(images_dir, image)
-            validate_image(image_path)
-
-            if (index + 1) % 100 == 0:
-                print('Validated {0} out of {1} images'.format(index + 1, size))
-
-        print('Finished validating the images')
-
-    except IOError as e:
-        print(e.message)
-        print("The image {0} wasn't downloaded successfully. "
-              "Please Open an issue in the github repository together with the error".format(image))
-
-
-def create_or_recreate_dir(dir_path):
-    if os.path.exists(dir_path):
-        shutil.rmtree(dir_path)
-    os.makedirs(dir_path)
-
-
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('num_images', type=int, help='The number of images in the ISIC Archive')
+    parser.add_argument('--images-dir', help='The directory in which the images will be downloaded to',
+                        default=join('Data', 'Images'))
+    parser.add_argument('--descs-dir', help='The directory in which the descriptions of '
+                                            'the images will be downloaded to',
+                        default=join('Data', 'Descriptions'))
+    parser.add_argument('--tss', type=int, help='The number of images each thread will download', default=300)
+    args = parser.parse_args()
+
+    main(num_images=args.num_images, images_dir=args.images_dir, descs_dir=args.descs_dir,
+         thread_subset_size=args.tss)
