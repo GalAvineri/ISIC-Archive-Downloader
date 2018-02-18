@@ -39,8 +39,6 @@ Or you could just `pip install -r requirements.txt`
     but it might not be worth any bothering
 
 # How does it work
-Here we'll explain the way the script is works.
-
 Searching for a few images using the API provided by the website, we found that the images are stored
 at a url which is in the template of \<prefix>  \<image id>  \<suffix>  
 and that their description are stored in \<prefix> \<image id>
