@@ -7,6 +7,8 @@ import shutil
 import requests
 from os.path import join
 from threading import Thread
+from multiprocessing import Pool
+from itertools import repeat
 
 
 def main(num_images, images_dir, descs_dir, thread_subset_size):
@@ -49,25 +51,20 @@ def download_dataset(ids, num_images, images_dir, descs_dir, thread_subset_size)
     bins.append(num_images)
     bin_starts = bins[:-1]
     bin_ends = bins[1:]
+    num_of_subsets = len(bin_starts)
 
     # Create a thread to provide a progress bar
     prog_thread = Thread(target=progress_bar, kwargs={'target': num_images, 'dir': descs_dir})
     prog_thread.start()
 
-    # Create threads to download each data subset
-    data_threads = []
-    for idx, (bin_start, bin_end) in enumerate(zip(bin_starts, bin_ends)):
-        data_thread = Thread(target=download_dataset_subset, kwargs={'start': bin_start, 'end': bin_end,
-                                                                     'ids': ids[bin_start: bin_end],
-                                                                     'images_dir': images_dir,
-                                                                     'descs_dir': descs_dir})
-        data_thread.start()
-        data_threads.append(data_thread)
+    # Have a process download each data subset
+    ids_subsets = [ids[bin_start: bin_end] for bin_start, bin_end in zip(bin_starts, bin_ends)]
+    pool = Pool(processes=num_of_subsets)
+    pool.starmap(download_dataset_subset, zip(bin_starts, bin_ends, ids_subsets, repeat(images_dir), repeat(descs_dir)))
 
-    # Wait for all the data threads to finish
-    for thread in data_threads:
-        thread.join()
-    # Wait for the progress bar thread finish
+    # The starmap function blocks until all the processes have finished
+    # So at this point all the images and descriptions have been downloaded.
+    # Collect the progress bar thread
     prog_thread.join()
 
 
