@@ -28,8 +28,10 @@ Or you could just `pip install -r requirements.txt`
 
 # Instructions
 1.  download or clone the repository
-2.  run download_dataset.py with the number of images currently available in the ISIC Archive  
+2.  run download_dataset.py with the number of images you would like to download.  
     e.g `python download_dataset 13000`  
+    If you would like to download the entire ISIC archive, just enter the current
+    number of images the archive possess. 
 3.  (optional)  
     You can change the default directories which the images and their descriptions will be downloaded to.  
     `python download_dataset 13000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
