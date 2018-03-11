@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from itertools import repeat
 
 
-def main(num_images, images_dir, descs_dir, thread_subset_size):
+def main(num_images, images_dir, descs_dir, num_processes):
     # If any of the images dir, descs dir or ids file exists - remove them so we won't override data
     # and perhaps create corrupted data
     create_or_recreate_dir(images_dir)
@@ -22,7 +22,7 @@ def main(num_images, images_dir, descs_dir, thread_subset_size):
 
     print('Downloading images and descriptions')
     download_dataset(ids=ids, num_images=num_images, images_dir=images_dir, descs_dir=descs_dir,
-                     thread_subset_size=thread_subset_size)
+                     num_processes=num_processes)
 
     print('Finished downloading the data set')
 
@@ -45,13 +45,15 @@ def get_images_ids(num_images):
     return ids
 
 
-def download_dataset(ids, num_images, images_dir, descs_dir, thread_subset_size):
+def download_dataset(ids, num_images, images_dir, descs_dir, num_processes):
+    # Each process will download a subset of the archive.
+    # Infer the size of the subsets
+    subset_size = num_images // num_processes
     # Split the data into subsets
-    bins = list(range(0, num_images, thread_subset_size))
-    bins.append(num_images)
+    bins = list(range(0, num_images, subset_size))
+    bins[-1] = num_images
     bin_starts = bins[:-1]
     bin_ends = bins[1:]
-    num_of_subsets = len(bin_starts)
 
     # Create a thread to provide a progress bar
     prog_thread = Thread(target=progress_bar, kwargs={'target': num_images, 'dir': descs_dir})
@@ -59,7 +61,7 @@ def download_dataset(ids, num_images, images_dir, descs_dir, thread_subset_size)
 
     # Have a process download each data subset
     ids_subsets = [ids[bin_start: bin_end] for bin_start, bin_end in zip(bin_starts, bin_ends)]
-    pool = Pool(processes=num_of_subsets)
+    pool = Pool(processes=num_processes)
     pool.starmap(download_dataset_subset, zip(bin_starts, bin_ends, ids_subsets, repeat(images_dir), repeat(descs_dir)))
 
     # The starmap function blocks until all the processes have finished
@@ -76,8 +78,8 @@ if __name__ == '__main__':
     parser.add_argument('--descs-dir', help='The directory in which the descriptions of '
                                             'the images will be downloaded to',
                         default=join('Data', 'Descriptions'))
-    parser.add_argument('--tss', type=int, help='The number of images each thread will download', default=300)
+    parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=8)
     args = parser.parse_args()
 
     main(num_images=args.num_images, images_dir=args.images_dir, descs_dir=args.descs_dir,
-         thread_subset_size=args.tss)
+         num_processes=args.p)

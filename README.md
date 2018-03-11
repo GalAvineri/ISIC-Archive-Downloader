@@ -36,14 +36,16 @@ Or you could just `pip install -r requirements.txt`
     You can change the default directories which the images and their descriptions will be downloaded to.  
     `python download_dataset 13000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
       
-    You can also change the default amount of images each thread will download  
-    ``python download_dataset 13000 -tss 300``  
-    but it might not be worth any bothering
+    You can also change the default amount of processes that will work in parallel to download  
+    the dataset
+    ``python download_dataset 13000 --p 16``  
+    But if you don't have a clue about this one, the default will be fine.
 
 # How does it work
 Searching for a few images using the API provided by the website, we found that the images are stored
 at a url which is in the template of \<prefix>  \<image id>  \<suffix>  
-and that their description are stored in \<prefix> \<image id>
+and that their description are stored in \<prefix> \<image id>  
+while the prefix and suffix parts are the same for all the images. 
 
 The website API also provides a way to request all the ids of all the images.
 
