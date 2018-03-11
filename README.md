@@ -61,14 +61,14 @@ just let us know and we will change it accordingly :)
 Feel free to use the issues tab for that.
 
 
-# Finally:
+# Finally
 We hope this script will allow researchers who had similliar difficulties
 accessing ISIC's Archive dataset to have easier access and enable them to provide further work on this field,
 as the ISIC foundation wishes :)
 
 If you stumble into any issues - let us know in the issues section!
 
-In addition, Any contributions or improvements to our code that will improve the comfort of the users 
+In addition, Any contributions or improvement ideas to our code that will improve the comfort of the users 
 will be dearly appreciated :)
 
 
