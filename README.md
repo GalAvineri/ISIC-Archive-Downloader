@@ -8,16 +8,17 @@ The current ways to download the archive, provided by the ISIC foundation and wh
 2. Download all the partitions of the archive, called 'datasets' one by one
 3. Downloading the images one by one via the Grider API provided in the site
 
-
 The first option (which is the easiest and most comfortable way) doesn't always work for some reason.  
-The download doesn't always finish successfully and sometimes fails along the way.  
-we suspect this is happening due to the large file size.
+The download doesn't always finish successfully,  
+and  we suspect this is happening due to the large file size.
   
-The second option seems rather good if you plan to download the archive a only few times
+The second option seems rather good if you plan to download the archive only a few times  
 and the third option seems unfeasible.  
 
-If you find the options above too laborious or unavailable, our script provides an comfortable alternative.  
-We made a comfortable script that downloads the entire archive automatically.
+If you find the options above too laborious or unavailable, this script provides a comfortable alternative.  
+This script can download the entire ISIC archive,  
+all you have to do is run it with the amount of images you'd like to download:  
+`python download_dataset <num of images>`
 
 # Requirements
 1.  requests  `pip install requests`
@@ -38,7 +39,7 @@ Or you could just `pip install -r requirements.txt`
       
     You can also change the default amount of processes that will work in parallel to download  
     the dataset
-    ``python download_dataset 13000 --p 16``  
+    `python download_dataset 13000 --p 16`  
     But if you don't have a clue about this one, the default will be fine.
 
 # How does it work
@@ -63,7 +64,7 @@ Feel free to use the issues tab for that.
 
 # Finally
 We hope this script will allow researchers who had similliar difficulties
-accessing ISIC's Archive dataset to have easier access and enable them to provide further work on this field,
+accessing ISIC's Archive to have easier access and enable them to provide further work on this field,
 as the ISIC foundation wishes :)
 
 If you stumble into any issues - let us know in the issues section!
