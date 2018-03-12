@@ -41,7 +41,7 @@ def get_images_ids(num_images):
     # Parse the metadata
     meta_data = response.json()
     # Extract the ids of the images
-    ids = [meta_data[index]['_id'] for index in range(num_images)]
+    ids = [meta_data[index]['_id'] for index in range(len(meta_data))]
     return ids
 
 
