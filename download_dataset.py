@@ -78,7 +78,7 @@ if __name__ == '__main__':
     parser.add_argument('--descs-dir', help='The directory in which the descriptions of '
                                             'the images will be downloaded to',
                         default=join('Data', 'Descriptions'))
-    parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=8)
+    parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=16)
     args = parser.parse_args()
 
     main(num_images=args.num_images, images_dir=args.images_dir, descs_dir=args.descs_dir,
