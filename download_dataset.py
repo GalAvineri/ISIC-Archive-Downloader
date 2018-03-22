@@ -20,6 +20,8 @@ def main(num_images, images_dir, descs_dir, num_processes):
     print('Collecting the images ids')
     ids = get_images_ids(num_images=num_images)
     num_images_found = len(ids)
+    if num_images_found != num_images:
+        print('Found {0} images and not the requested {1}'.format(num_images_found, num_images))
 
     print('Downloading images and descriptions')
     download_dataset(ids=ids, num_images=num_images_found, images_dir=images_dir, descs_dir=descs_dir,
