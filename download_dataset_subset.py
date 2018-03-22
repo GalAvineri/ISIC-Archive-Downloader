@@ -8,7 +8,7 @@ import json
 from PIL import Image
 
 
-def download_dataset_subset(start, end, ids, images_dir, descs_dir):
+def download_dataset_subset(ids, images_dir, descs_dir):
     # The url template for the image is <base url prefix><image id><base url suffix>
     # The url template for the description of the image is: <base url prefix><image id>
     base_url_prefix = 'https://isic-archive.com/api/v1/image/'
@@ -17,7 +17,7 @@ def download_dataset_subset(start, end, ids, images_dir, descs_dir):
     # For each id:
     # 1. get the corresponding image and description urls
     # 2. download the image and the description from the urls
-    for id, index in zip(ids, range(start, end)):
+    for id in ids:
         # Build the image url
         url_image = base_url_prefix + id + base_url_suffix
         # Build the description url

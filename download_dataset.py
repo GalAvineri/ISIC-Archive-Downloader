@@ -62,7 +62,7 @@ def download_dataset(ids, num_images, images_dir, descs_dir, num_processes):
     # Have a process download each data subset
     ids_subsets = [ids[bin_start: bin_end] for bin_start, bin_end in zip(bin_starts, bin_ends)]
     pool = Pool(processes=num_processes)
-    pool.starmap(download_dataset_subset, zip(bin_starts, bin_ends, ids_subsets, repeat(images_dir), repeat(descs_dir)))
+    pool.starmap(download_dataset_subset, zip(ids_subsets, repeat(images_dir), repeat(descs_dir)))
 
     # The starmap function blocks until all the processes have finished
     # So at this point all the images and descriptions have been downloaded.
