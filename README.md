@@ -21,9 +21,6 @@ all you have to do is run it with the amount of images you'd like to download:
 `python download_dataset <num of images>`
 
 # Requirements
-Python: Python 3.3 and beyond
-
-Packages:
 1.  requests  `pip install requests`
 2.  PIL  `pip install Pillow`
 3.  progressbar2  `pip install progressbar2`

@@ -8,6 +8,10 @@ import json
 from PIL import Image
 
 
+def download_dataset_subset_wrapper(args):
+    download_dataset_subset(*args)
+
+
 def download_dataset_subset(ids, images_dir, descs_dir):
     # The url template for the image is <base url prefix><image id><base url suffix>
     # The url template for the description of the image is: <base url prefix><image id>
