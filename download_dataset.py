@@ -19,9 +19,10 @@ def main(num_images, images_dir, descs_dir, num_processes):
 
     print('Collecting the images ids')
     ids = get_images_ids(num_images=num_images)
+    num_images_found = len(ids)
 
     print('Downloading images and descriptions')
-    download_dataset(ids=ids, num_images=num_images, images_dir=images_dir, descs_dir=descs_dir,
+    download_dataset(ids=ids, num_images=num_images_found, images_dir=images_dir, descs_dir=descs_dir,
                      num_processes=num_processes)
 
     print('Finished downloading the data set')
