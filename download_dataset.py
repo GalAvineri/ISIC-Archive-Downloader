@@ -1,4 +1,4 @@
-from download_dataset_subset import download_dataset_subset_wrapper
+from download_dataset_subset import downlad_image_desc_wrapper
 from progress_bar import progress_bar
 
 import argparse
@@ -49,23 +49,13 @@ def get_images_ids(num_images):
 
 
 def download_dataset(ids, num_images, images_dir, descs_dir, num_processes):
-    # Each process will download a subset of the archive.
-    # Infer the size of the subsets
-    subset_size = num_images // num_processes
-    # Split the data into subsets
-    bins = list(range(0, num_images, subset_size))
-    bins[-1] = num_images
-    bin_starts = bins[:-1]
-    bin_ends = bins[1:]
-
     # Create a thread to provide a progress bar
     prog_thread = Thread(target=progress_bar, kwargs={'target': num_images, 'dir': descs_dir})
     prog_thread.start()
 
     # Have a process download each data subset
-    ids_subsets = [ids[bin_start: bin_end] for bin_start, bin_end in zip(bin_starts, bin_ends)]
     pool = Pool(processes=num_processes)
-    pool.map(download_dataset_subset_wrapper, zip(ids_subsets, repeat(images_dir), repeat(descs_dir)))
+    pool.map(downlad_image_desc_wrapper, zip(ids, repeat(images_dir), repeat(descs_dir)))
 
     # The starmap function blocks until all the processes have finished
     # So at this point all the images and descriptions have been downloaded.
