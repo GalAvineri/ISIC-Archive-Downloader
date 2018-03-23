@@ -19,5 +19,5 @@ def progress_bar(target, dir):
         num_elems_cur = len(os.listdir(dir))
         while num_elems_cur < target:
             bar.update(num_elems_cur)
-            time.sleep(1)
+            time.sleep(5)
             num_elems_cur = len(os.listdir(dir))
