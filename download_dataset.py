@@ -1,4 +1,4 @@
-from download_dataset_subset import downlad_image_desc_wrapper
+from download_image import downlad_image_desc_wrapper
 from progress_bar import progress_bar
 
 import argparse
@@ -11,14 +11,15 @@ from multiprocessing import Pool
 from itertools import repeat
 
 
-def main(num_images, images_dir, descs_dir, num_processes):
+def main(num_images, offset, images_dir, descs_dir, num_processes):
     # If any of the images dir, descs dir or ids file exists - remove them so we won't override data
     # and perhaps create corrupted data
     create_or_recreate_dir(images_dir)
     create_or_recreate_dir(descs_dir)
 
     print('Collecting the images ids')
-    ids = get_images_ids(num_images=num_images)
+    ids = get_images_ids(num_images=num_images, offset=offset)
+
     num_images_found = len(ids)
     if num_images_found != num_images:
         print('Found {0} images and not the requested {1}'.format(num_images_found, num_images))
@@ -36,9 +37,9 @@ def create_or_recreate_dir(dir_path):
     os.makedirs(dir_path)
 
 
-def get_images_ids(num_images):
+def get_images_ids(num_images, offset):
     # Specify the url that lists the meta data about the images (id, name, etc..)
-    url = 'https://isic-archive.com/api/v1/image?limit={0}&offset=0&sort=name&sortdir=1'.format(num_images)
+    url = 'https://isic-archive.com/api/v1/image?limit={0}&offset={1}&sort=name&sortdir=1'.format(num_images, offset)
     # Get the images metadata
     response = requests.get(url, stream=True)
     # Parse the metadata
@@ -65,7 +66,8 @@ def download_dataset(ids, num_images, images_dir, descs_dir, num_processes):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('num_images', type=int, help='The number of images in the ISIC Archive')
+    parser.add_argument('num_images', type=int, help='The number of images you would like to download from the ISIC Archive')
+    parser.add_argument('--offset', type=int, help='The offset of the image index from which to start downloading', default=0)
     parser.add_argument('--images-dir', help='The directory in which the images will be downloaded to',
                         default=join('Data', 'Images'))
     parser.add_argument('--descs-dir', help='The directory in which the descriptions of '
@@ -74,5 +76,5 @@ if __name__ == '__main__':
     parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=16)
     args = parser.parse_args()
 
-    main(num_images=args.num_images, images_dir=args.images_dir, descs_dir=args.descs_dir,
+    main(num_images=args.num_images, offset=args.offset, images_dir=args.images_dir, descs_dir=args.descs_dir,
          num_processes=args.p)
