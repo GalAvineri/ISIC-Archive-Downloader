@@ -14,7 +14,7 @@ base_url_suffix = '/download?contentDisposition=inline'
 
 
 def download_and_save_description_wrapper(args):
-    download_and_save_description(*args)
+    return download_and_save_description(*args)
 
 
 def download_and_save_description(id, descriptions_dir) -> list:

@@ -31,7 +31,7 @@ def main(num_images_requested, offset, filter, images_dir, descs_dir, num_proces
         print('Collecting ids of all the images')
         ids = get_images_ids(num_images=None, offset=offset)
 
-        print('Downloading the images descriptions, while filtering only {0} images'.format(filter))
+        print('Downloading images descriptions, while filtering only {0} images'.format(filter))
         descriptions = download_descriptions_and_filter(ids=ids, num_images_requested=num_images_requested, filter=filter,
                                                         descs_dir=descs_dir)
 
@@ -83,7 +83,7 @@ def download_descriptions(ids: list, descs_dir: str, num_processes: int) -> list
     """
     # Split the download among multiple processes
     pool = ThreadPool(processes=num_processes)
-    descriptions = list(tqdm(pool.imap(download_and_save_description_wrapper, zip(ids, repeat(descs_dir)))))
+    descriptions = list(tqdm(pool.imap(download_and_save_description_wrapper, zip(ids, repeat(descs_dir))), total=len(ids)))
     return descriptions
 
 
@@ -120,7 +120,7 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
 def download_images(descriptions: list, images_dir: str, num_processes: int):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    tqdm(pool.map(download_and_save_image_wrapper, zip(descriptions, repeat(images_dir))))
+    tqdm(pool.map(download_and_save_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions))
 
 
 if __name__ == '__main__':
