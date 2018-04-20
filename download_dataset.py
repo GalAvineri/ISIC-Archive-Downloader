@@ -14,8 +14,8 @@ from itertools import repeat
 def main(num_images, offset, images_dir, descs_dir, num_processes):
     # If any of the images dir, descs dir or ids file exists - remove them so we won't override data
     # and perhaps create corrupted data
-    create_or_recreate_dir(images_dir)
-    create_or_recreate_dir(descs_dir)
+    create_if_none(images_dir)
+    create_if_none(descs_dir)
 
     print('Collecting the images ids')
     ids = get_images_ids(num_images=num_images, offset=offset)
@@ -31,10 +31,9 @@ def main(num_images, offset, images_dir, descs_dir, num_processes):
     print('Finished downloading the data set')
 
 
-def create_or_recreate_dir(dir_path):
-    if os.path.exists(dir_path):
-        shutil.rmtree(dir_path)
-    os.makedirs(dir_path)
+def create_if_none(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
 
 def get_images_ids(num_images, offset):
