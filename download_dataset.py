@@ -83,7 +83,7 @@ def download_descriptions(ids: list, descs_dir: str, num_processes: int) -> list
     """
     # Split the download among multiple processes
     pool = ThreadPool(processes=num_processes)
-    descriptions = list(tqdm(pool.imap(download_and_save_description_wrapper, zip(ids, repeat(descs_dir))), total=len(ids)))
+    descriptions = list(tqdm(pool.imap(download_and_save_description_wrapper, zip(ids, repeat(descs_dir))), total=len(ids), desc='Descriptions Downloaded'))
     return descriptions
 
 
@@ -98,6 +98,15 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
     """
     descriptions = []
 
+    if num_images_requested is None:
+        max_num_images = len(ids)
+        pbar_desc = 'Descriptions Scanned'
+    else:
+        max_num_images = num_images_requested
+        pbar_desc = '{0}s Found'.format(filter.title())
+
+    pbar = tqdm(total=max_num_images, desc=pbar_desc)
+
     for id in ids:
         description = download_description(id)
         try:
@@ -111,8 +120,16 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
             descriptions.append(description)
             save_description(description, descs_dir)
 
+            if num_images_requested is not None:
+                pbar.update(1)
+
             if num_images_requested is not None and len(descriptions) == num_images_requested:
                 break
+
+        if num_images_requested is None:
+            pbar.update(1)
+
+    pbar.close()
 
     return descriptions
 
@@ -120,7 +137,7 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
 def download_images(descriptions: list, images_dir: str, num_processes: int):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    tqdm(pool.map(download_and_save_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions))
+    tqdm(pool.map(download_and_save_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Images Downloaded')
 
 
 if __name__ == '__main__':
