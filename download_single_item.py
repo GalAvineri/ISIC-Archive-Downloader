@@ -8,11 +8,11 @@ import json
 from PIL import Image
 
 
-def downlad_image_desc_wrapper(args):
-    download_image_desc(*args)
+def downlad_image_and_desc_wrapper(args):
+    download_image_and_desc(*args)
 
 
-def download_image_desc(id, images_dir, descs_dir):
+def download_image_and_desc(id, images_dir, descs_dir):
     """
     # 1. get the corresponding image and description urls
     # 2. download the image and the description from the urls

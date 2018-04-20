@@ -1,5 +1,5 @@
 # ISIC Archive Downloader
-The ISIC Archive contains over 13k images of skin lesions, labeled as 'benign' or 'malignant'.  
+The ISIC Archive contains over 23k images of skin lesions, labeled as 'benign' or 'malignant'.
 The archive can be found here:
 https://isic-archive.com/#images
 
@@ -18,7 +18,7 @@ and the third option seems unfeasible.
 If you find the options above too laborious or unavailable, this script provides a comfortable alternative.  
 This script can download the entire ISIC archive,  
 all you have to do is run it with the amount of images you'd like to download:  
-`python download_dataset <num of images>`
+`python download_dataset.py <num of images>`
 
 # Requirements
 1.  requests  `pip install requests`
@@ -30,21 +30,21 @@ Or you could just `pip install -r requirements.txt`
 # Instructions
 1.  download or clone the repository
 2.  run download_dataset.py with the number of images you would like to download.  
-    e.g `python download_dataset 13000`  
+    e.g `python download_dataset.py 23000`
     If you would like to download the entire ISIC archive, just enter the current
     number of images the archive possess.
     
     Warning: Make sure you have enough space in the download destination.  
-    Otherwise the download will run into errors. 
-    
-3.  (optional)  
-    You can change the default directories which the images and their descriptions will be downloaded to.  
-    `python download_dataset 13000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
-      
-    You can also change the default amount of processes that will work in parallel to download  
-    the dataset
-    `python download_dataset 13000 --p 16`  
-    But if you don't have a clue about this one, the default will be fine.
+    Otherwise the download will run into errors.
+
+#### Optional
+1. You can change the default directories which the images and their descriptions will be downloaded to.
+`python download_dataset.py 23000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
+2. You can choose to download either only benign or malignant images. `python download_dataset.py 23000 --filter benign`
+3. You can also change the default amount of processes that will work in parallel to download
+the dataset
+`python download_dataset.py 23000 --p 16`
+But if you don't have a clue about this one, the default will be fine.
 
 # How does it work
 Searching for a few images using the API provided by the website, we found that the images are stored

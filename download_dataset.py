@@ -1,4 +1,4 @@
-from download_image import downlad_image_desc_wrapper
+from download_single_item import downlad_image_and_desc_wrapper
 from progress_bar import progress_bar
 
 import argparse
@@ -56,7 +56,7 @@ def download_dataset(ids, num_images, images_dir, descs_dir, num_processes):
 
     # Have a process download each data subset
     pool = Pool(processes=num_processes)
-    pool.map(downlad_image_desc_wrapper, zip(ids, repeat(images_dir), repeat(descs_dir)))
+    pool.map(downlad_image_and_desc_wrapper, zip(ids, repeat(images_dir), repeat(descs_dir)))
 
     # The starmap function blocks until all the processes have finished
     # So at this point all the images and descriptions have been downloaded.
