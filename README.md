@@ -8,43 +8,55 @@ The current ways to download the archive, provided by the ISIC foundation and wh
 2. Download all the partitions of the archive, called 'datasets' one by one
 3. Downloading the images one by one via the Grider API provided in the site
 
-The first option (which is the easiest and most comfortable way) doesn't always work for some reason.  
-The download doesn't always finish successfully,  
-and  we suspect this is happening due to the large file size.
+The first option (which is the easiest and most comfortable way) doesn't always finish successfully for some reason.
+We suspect this is happening due to the large file size.
   
 The second option seems rather good if you plan to download the archive only a few times  
 and the third option seems unfeasible.  
 
 If you find the options above too laborious or unavailable, this script provides a comfortable alternative.  
-This script can download the entire ISIC archive,  
-all you have to do is run it with the amount of images you'd like to download:  
-`python download_dataset.py <num of images>`
+This script can download the entire ISIC archive ([or parts of it](#optional-download-abilities))
+all you have to do is run `python download_dataset.py`
 
 # Requirements
 1.  requests  `pip install requests`
 2.  PIL  `pip install Pillow`
-3.  progressbar2  `pip install progressbar2`
+3.  tqdm  `pip install tqdm`
 
 Or you could just `pip install -r requirements.txt`
 
 # Instructions
 1.  download or clone the repository
-2.  run download_dataset.py with the number of images you would like to download.  
-    e.g `python download_dataset.py 23000`
-    If you would like to download the entire ISIC archive, just enter the current
-    number of images the archive possess.
-    
-    Warning: Make sure you have enough space in the download destination.  
-    Otherwise the download will run into errors.
+2.  run download_dataset.py `python download_dataset.py`
 
-#### Optional
-1. You can change the default directories which the images and their descriptions will be downloaded to.
-`python download_dataset.py 23000 --images-dir /Data/Images --descs-dir /Data/Descriptions`
-2. You can choose to download either only benign or malignant images. `python download_dataset.py 23000 --filter benign`
-3. You can also change the default amount of processes that will work in parallel to download
-the dataset
-`python download_dataset.py 23000 --p 16`
-But if you don't have a clue about this one, the default will be fine.
+#### Note
+By default if you call the script in the following way:
+`python <root>/.../download_dataset.py`
+the images will be download to <root>/Data/Images
+and the descriptions will be downloaded to <root>/Data/Descriptions
+
+
+#### Warnings
+1. Make sure you have enough space in the download destination.
+Otherwise the download will run into errors.
+2. The download might take a few hours.
+
+# Optional download abilities
+1. You can download a subset of the archive by specifying how many images you would like.
+   `python download_dataset.py --num_images 1000`
+   If this option isn't present, the program will download all the available images.
+2. You can start downloading images from an offset.
+   `python download_dataset.py --offset 100`
+   This is useful for example if you would like to append upon a prior download.
+3. You can choose to download either only benign or malignant images.
+   `python download_dataset.py --filter benign`
+   Note: If you would like k benign images instead of all the benign images, you could do
+   `python download_dataset.py --num_images k --filter benign`
+4. You can change the default directories the images and the descriptions will be downloaded into.
+`python download_dataset.py --images-dir /Data/Images --descs-dir /Data/Descriptions`
+5. You can also change the default amount of processes that will work in parallel to download the dataset.
+`python download_dataset.py --p 16`
+But if you have no knowledge about this one, the default will be fine.
 
 # How does it work
 Searching for a few images using the API provided by the website, we found that the images are stored
@@ -54,10 +66,10 @@ while the prefix and suffix parts are the same for all the images.
 
 The website API also provides a way to request all the ids of all the images.
 
-So we wrote a script that:
-1. Requests the ids of all the images
-2. Builds the urls by the given template
-3. Downloads the images and descriptions from the built urls 
+So the basic portion of the script is:
+1. Request the ids of all the images
+2. Build the urls by the given template
+3. Download the images and descriptions from the built urls
 
 # Note
 As mentioned above, we assume that the urls of the images and descriptions are built by a certain template.  
@@ -67,8 +79,8 @@ Feel free to use the issues tab for that.
 
 
 # Finally
-We hope this script will allow researchers who had similliar difficulties
-accessing ISIC's Archive to have easier access and enable them to provide further work on this field,
+We hope this script will allow researchers, who had similliar difficulties
+accessing ISIC's archive, to have easier access and enable them to provide further work on this field,
 as the ISIC foundation wishes :)
 
 If you stumble into any issues - let us know in the issues section!

@@ -7,59 +7,99 @@ from requests.exceptions import RequestException
 import json
 from PIL import Image
 
+# The url template for the image is <base url prefix><image id><base url suffix>
+# The url template for the description of the image is: <base url prefix><image id>
+base_url_prefix = 'https://isic-archive.com/api/v1/image/'
+base_url_suffix = '/download?contentDisposition=inline'
 
-def downlad_image_and_desc_wrapper(args):
-    download_image_and_desc(*args)
+
+def download_and_save_description_wrapper(args):
+    download_and_save_description(*args)
 
 
-def download_image_and_desc(id, images_dir, descs_dir):
+def download_and_save_description(id, descriptions_dir) -> list:
     """
-    # 1. get the corresponding image and description urls
-    # 2. download the image and the description from the urls
-    :param id:
-    :param images_dir:
-    :param descs_dir:
-    :return:
-    """
-    # The url template for the image is <base url prefix><image id><base url suffix>
-    # The url template for the description of the image is: <base url prefix><image id>
-    base_url_prefix = 'https://isic-archive.com/api/v1/image/'
-    base_url_suffix = '/download?contentDisposition=inline'
 
-    # Build the image url
-    url_image = base_url_prefix + id + base_url_suffix
+    :param id: Id of the image whose description will be downloaded
+    :param descriptions_dir:
+    :return: Json
+    """
+    description = download_description(id)
+    save_description(description, descriptions_dir)
+    return description
+
+
+def download_description(id) -> list:
+    """
+
+    :param id: Id of the image whose description will be downloaded
+    :return: Json
+    """
     # Build the description url
     url_desc = base_url_prefix + id
 
     # Download the image and description using the url
     # Sometimes their site isn't responding well, and than an error occurs,
     # So we will retry 10 seconds later and repeat until it succeeds
-    succeeded = False
-    while not succeeded:
+    while True:
         try:
-            # Download the image and description
-            response_image = requests.get(url_image, stream=True, timeout=20)
+            # Download the description
             response_desc = requests.get(url_desc, stream=True, timeout=20)
             # Validate the download status is ok
-            response_image.raise_for_status()
             response_desc.raise_for_status()
+            # Parse the description
+            parsed_description = response_desc.json()
+            return parsed_description
+        except RequestException:
+            time.sleep(10)
+        except ReadTimeoutError:
+            time.sleep(10)
+        except IOError:
+            time.sleep(10)
 
-            # Parse the description and write it into a file
-            parsed_desc = response_desc.json()
+
+def save_description(description, descriptions_dir):
+    """
+
+    :param description: Json
+    :param descriptions_dir:
+    :return:
+    """
+    desc_path = join(descriptions_dir, description['name'])
+    with open(desc_path, 'w') as descFile:
+        json.dump(description, descFile, indent=2)
+
+
+def download_and_save_image_wrapper(args):
+    download_and_save_image(*args)
+
+
+def download_and_save_image(description, images_dir):
+    """
+
+    :param description: Json describing the image
+    :param images_dir: Directory in which to save the image
+    """
+    # Build the image url
+    url_image = base_url_prefix + description['_id'] + base_url_suffix
+
+    # Download the image and description using the url
+    # Sometimes their site isn't responding well, and than an error occurs,
+    # So we will retry 10 seconds later and repeat until it succeeds
+    while True:
+        try:
+            response_image = requests.get(url_image, stream=True, timeout=20)
+            # Validate the download status is ok
+            response_image.raise_for_status()
 
             # Write the image into a file
-            img_path = join(images_dir, '{0}.jpg'.format(parsed_desc['name']))
+            img_path = join(images_dir, '{0}.jpg'.format(description['name']))
             with open(img_path, 'wb') as imageFile:
                 shutil.copyfileobj(response_image.raw, imageFile)
 
             # Validate the image was downloaded correctly
             validate_image(img_path)
-
-            desc_path = join(descs_dir, parsed_desc['name'])
-            with open(desc_path, 'w') as descFile:
-                json.dump(parsed_desc, descFile, indent=2)
-
-            succeeded = True
+            return
         except RequestException:
             time.sleep(10)
         except ReadTimeoutError:
