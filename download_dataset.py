@@ -125,7 +125,7 @@ def download_images(descriptions: list, images_dir: str, num_processes: int):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-- num_images', type=int, help='The number of images you would like to download from the ISIC Archive. '
+    parser.add_argument('--num_images', type=int, help='The number of images you would like to download from the ISIC Archive. '
                                                         'Leave empty to download all the available images', default=None)
     parser.add_argument('--offset', type=int, help='The offset of the image index from which to start downloading', default=0)
     parser.add_argument('--filter', help='Indicates whether to download only benign or malignant images', choices=['benign', 'malignant'], default=None)
