@@ -16,7 +16,7 @@ and the third option seems unfeasible.
 
 If you find the options above too laborious or unavailable, this script provides a comfortable alternative.  
 This script can download the entire ISIC archive ([or parts of it](#optional-download-abilities))  
-all you have to do is run `python download_dataset.py`
+all you have to do is run `python download_archive.py`
 
 # Requirements
 1.  requests  `pip install requests`
@@ -27,11 +27,11 @@ Or you could just `pip install -r requirements.txt`
 
 # Instructions
 1.  download or clone the repository
-2.  run download_dataset.py `python download_dataset.py`
+2.  run download_archive.py `python download_archive.py`
 
 #### Note
 By default if you call the script in the following way:  
-`python <root>/.../download_dataset.py`  
+`python <root>/.../download_archive.py`  
 the images will be download to \<root\>/Data/Images  
 and the descriptions will be downloaded to \<root\>/Data/Descriptions
 
@@ -43,19 +43,19 @@ Otherwise the download will run into errors.
 
 # Optional download abilities
 1. You can download a subset of the archive by specifying how many images you would like.  
-`python download_dataset.py --num_images 1000`  
+`python download_archive.py --num_images 1000`  
 If this option isn't present, the program will download all the available images.
 2. You can start downloading images from an offset.  
-   `python download_dataset.py --offset 100`  
+   `python download_archive.py --offset 100`  
    This is useful for example if you would like to append upon a prior download.
 3. You can choose to download either only benign or malignant images.  
-   `python download_dataset.py --filter benign`  
+   `python download_archive.py --filter benign`  
    Note: If you would like k benign images instead of all the benign images, you could do  
-   `python download_dataset.py --num_images k --filter benign`
+   `python download_archive.py --num_images k --filter benign`
 4. You can change the default directories the images and the descriptions will be downloaded into.  
-`python download_dataset.py --images-dir /Data/Images --descs-dir /Data/Descriptions`
-5. You can also change the default amount of processes that will work in parallel to download the dataset.  
-`python download_dataset.py --p 16`  
+`python download_archive.py --images-dir /Data/Images --descs-dir /Data/Descriptions`
+5. You can also change the default amount of processes that will work in parallel to download the archive.  
+`python download_archive.py --p 16`  
 But if you have no knowledge about this one, the default will be fine.
 
 # How does it work
