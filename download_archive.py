@@ -9,7 +9,7 @@ from itertools import repeat
 from tqdm import tqdm
 
 
-def main(num_images_requested, offset, filter, images_dir, descs_dir, num_processes):
+def main(num_images_requested, offset, include_segmentation, filter, images_dir, descs_dir, seg_dir, num_processes):
     # If any of the images dir and descs dir don't exist, create them
     create_if_none(images_dir)
     create_if_none(descs_dir)
@@ -42,8 +42,13 @@ def main(num_images_requested, offset, filter, images_dir, descs_dir, num_proces
             print('Found {0} {1} images and not the requested {2}'.format(num_descs_filtered, filter,
                                                                           num_images_requested))
 
+    # By this point we've got the description of only the required images
     print('Downloading images')
     download_images(descriptions=descriptions, images_dir=images_dir, num_processes=num_processes)
+
+    if include_segmentation:
+        print('Downloading segmentation')
+        download_images_segmentation(descriptions=descriptions, seg_dir=seg_dir, num_processes=num_processes)
 
     print('Finished downloading')
 
@@ -140,19 +145,60 @@ def download_images(descriptions: list, images_dir: str, num_processes: int):
     tqdm(pool.map(download_and_save_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Images Downloaded')
 
 
+def confirm_arguments(args):
+    print('You have decided to do the following:')
+    if args.num_images is None:
+        print('Download all the available images')
+    else:
+        print('Download maximum of {0} images'.format(args.num_images))
+
+    if args.include_segmentation:
+        print('Download images segmentation as well')
+
+    print('start with offset {0}'.format(args.offset))
+
+    if args.filter:
+        print('filter only {0} images'.format(args.filter))
+    else:
+        print('Use no filter (only benign / only malignant)'.format(args.filter))
+
+    print('Images will be downloaded to ' + args.images_dir)
+    print('Descriptions will be downloaded to ' + args.descs_dir)
+    if args.include_segmentation:
+        print('Segmentations will be downloaded to ' + args.descs_dir)
+
+    print('Use {0} processes to download the archive'.format(args.p))
+
+    res = input('Do you confirm your choices? [y/n]')
+
+    while res != 'y' and res != 'n':
+        res = input('Invalid input. Do you confirm your choices? [y/n]')
+    if res == 'y':
+        return True
+    if res == 'n':
+        return False
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_images', type=int, help='The number of images you would like to download from the ISIC Archive. '
                                                         'Leave empty to download all the available images', default=None)
     parser.add_argument('--offset', type=int, help='The offset of the image index from which to start downloading', default=0)
+    parser.add_argument('-s', '--include-segmentation', help='Whether to download the segmentation of the images as well', action="store_true")
     parser.add_argument('--filter', help='Indicates whether to download only benign or malignant images', choices=['benign', 'malignant'], default=None)
     parser.add_argument('--images-dir', help='The directory in which the images will be downloaded to',
                         default=join('Data', 'Images'))
     parser.add_argument('--descs-dir', help='The directory in which the descriptions of '
                                             'the images will be downloaded to',
                         default=join('Data', 'Descriptions'))
+    parser.add_argument('--seg-dir', help='The directory in which the segmentation of '
+                                            'the images will be downloaded to',
+                        default=join('Data', 'Segmentation'))
     parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=16)
     args = parser.parse_args()
 
-    main(num_images_requested=args.num_images, offset=args.offset, filter=args.filter, images_dir=args.images_dir, descs_dir=args.descs_dir,
+    confirm_arguments(args)
+
+    main(num_images_requested=args.num_images, offset=args.offset, include_segmentation=args.include_segmentation,
+         filter=args.filter, images_dir=args.images_dir, descs_dir=args.descs_dir, seg_dir=args.seg_dir,
          num_processes=args.p)
