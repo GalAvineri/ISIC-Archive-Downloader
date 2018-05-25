@@ -50,7 +50,7 @@ def main(num_images_requested, offset, segmentation, filter, images_dir, descs_d
     if segmentation:
         print('Downloading segmentation')
         create_if_none(seg_dir)
-        download_images_segmentation(descriptions=descriptions, seg_dir=seg_dir, num_processes=num_processes)
+        download_segmentations(descriptions=descriptions, seg_dir=seg_dir, num_processes=num_processes)
 
     print('Finished downloading')
 
@@ -144,14 +144,14 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
 def download_images(descriptions: list, images_dir: str, num_processes: int):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    tqdm(pool.map(download_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Images Downloaded')
+    list(tqdm(pool.imap(download_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Images Downloaded'))
 
 
-def download_images_segmentation(descriptions, seg_dir, num_processes):
+def download_segmentations(descriptions, seg_dir, num_processes):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    tqdm(pool.map(download_segmentation_wrapper, zip(descriptions, repeat(seg_dir))), total=len(descriptions),
-         desc='Segmentations Downloaded')
+    list(tqdm(pool.imap(download_segmentation_wrapper, zip(descriptions, repeat(seg_dir))), total=len(descriptions),
+         desc='Segmentations Downloaded'))
 
 
 def confirm_arguments(args):
@@ -181,7 +181,7 @@ def confirm_arguments(args):
     res = input('Do you confirm your choices? [Y/n] ')
 
     while res not in ['y', '', 'n']:
-        res = input('Invalid input. Do you confirm your choices? [y/n] ')
+        res = input('Invalid input. Do you confirm your choices? [Y/n] ')
     if res in ['y', '']:
         return True
     if res == 'n':

@@ -123,6 +123,7 @@ def download_image(img_url, img_name, dir, type='jpg'):
     # So we will retry 10 seconds later and repeat until it succeeds
     while True:
         try:
+            # print('Attempting to download image {0}'.format(img_name))
             response_image = requests.get(img_url, stream=True, timeout=20)
             # Validate the download status is ok
             response_image.raise_for_status()
@@ -134,6 +135,8 @@ def download_image(img_url, img_name, dir, type='jpg'):
 
             # Validate the image was downloaded correctly
             validate_image(img_path)
+
+            # print('Finished Downloading image {0}'.format(img_name))
             return
         except RequestException:
             time.sleep(10)
