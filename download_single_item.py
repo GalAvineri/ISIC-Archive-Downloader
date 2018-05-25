@@ -9,42 +9,69 @@ from PIL import Image
 
 # The url template for the image is <base url prefix><image id><base url suffix>
 # The url template for the description of the image is: <base url prefix><image id>
-base_url_prefix = 'https://isic-archive.com/api/v1/image/'
-base_url_suffix = '/download?contentDisposition=inline'
+img_url_prefix = 'https://isic-archive.com/api/v1/image/'
+img_url_suffix = '/download?contentDisposition=inline'
+seg_url_prefix = 'https://isic-archive.com/api/v1/segmentation'
+seg_id_url_prefix = seg_url_prefix + '?limit=1&sort=created&sortdir=-1&imageId='
+seg_img_url_prefix = seg_url_prefix + '/'
+seg_img_url_suffix = '/mask?contentDisposition=inline'
 
 
-def download_and_save_description_wrapper(args):
-    return download_and_save_description(*args)
+def download_description_wrapper(args):
+    return download_image_description(*args)
 
 
-def download_and_save_description(id, descriptions_dir) -> list:
+def download_image_description(id, descriptions_dir) -> list:
     """
 
     :param id: Id of the image whose description will be downloaded
     :param descriptions_dir:
     :return: Json
     """
-    description = download_description(id)
+    desc_url = img_url_prefix + id
+    description = fetch_description(desc_url)
     save_description(description, descriptions_dir)
     return description
 
 
-def download_description(id) -> list:
+def fetch_description(url : str) -> list:
     """
 
     :param id: Id of the image whose description will be downloaded
     :return: Json
     """
-    # Build the description url
-    url_desc = base_url_prefix + id
-
-    # Download the image and description using the url
     # Sometimes their site isn't responding well, and than an error occurs,
     # So we will retry 10 seconds later and repeat until it succeeds
     while True:
         try:
             # Download the description
-            response_desc = requests.get(url_desc, stream=True, timeout=20)
+            response_desc = requests.get(url, stream=True, timeout=20)
+            # Validate the download status is ok
+            response_desc.raise_for_status()
+            # Parse the description
+            parsed_description = response_desc.json()
+            return parsed_description
+        except RequestException:
+            time.sleep(10)
+        except ReadTimeoutError:
+            time.sleep(10)
+        except IOError:
+            time.sleep(10)
+
+
+def fetch_img_description(id : str) -> list:
+    """
+
+    :param id: Id of the image whose description will be downloaded
+    :return: Json
+    """
+    # Sometimes their site isn't responding well, and than an error occurs,
+    # So we will retry 10 seconds later and repeat until it succeeds
+    url = img_url_prefix + id
+    while True:
+        try:
+            # Download the description
+            response_desc = requests.get(url, stream=True, timeout=20)
             # Validate the download status is ok
             response_desc.raise_for_status()
             # Parse the description
@@ -70,30 +97,38 @@ def save_description(description, descriptions_dir):
         json.dump(description, descFile, indent=2)
 
 
-def download_and_save_image_wrapper(args):
-    download_and_save_image(*args)
-
-
-def download_and_save_image(description, images_dir):
+def download_image_wrapper(args):
     """
-
+    :param args containing parameters (description, imagse_dir)
     :param description: Json describing the image
-    :param images_dir: Directory in which to save the image
+    :param dir: Directory in which to save the image
     """
-    # Build the image url
-    url_image = base_url_prefix + description['_id'] + base_url_suffix
+    description, dir = args
 
-    # Download the image and description using the url
+    # Build the image url
+    img_url = img_url_prefix + description['_id'] + img_url_suffix
+
+    download_image(img_url=img_url, img_name=description['name'], dir=dir)
+
+
+def download_image(img_url, img_name, dir, type='jpg'):
+    """
+    Download the image from the given url and save it in the given dir,
+    naming it using img_name with an jpg extension
+    :param img_name:
+    :param img_url: Url to download the image through
+    :param dir: Directory in which to save the image
+    """
     # Sometimes their site isn't responding well, and than an error occurs,
     # So we will retry 10 seconds later and repeat until it succeeds
     while True:
         try:
-            response_image = requests.get(url_image, stream=True, timeout=20)
+            response_image = requests.get(img_url, stream=True, timeout=20)
             # Validate the download status is ok
             response_image.raise_for_status()
 
             # Write the image into a file
-            img_path = join(images_dir, '{0}.jpg'.format(description['name']))
+            img_path = join(dir, '{0}.{1}'.format(img_name, type))
             with open(img_path, 'wb') as imageFile:
                 shutil.copyfileobj(response_image.raw, imageFile)
 
@@ -106,6 +141,26 @@ def download_and_save_image(description, images_dir):
             time.sleep(10)
         except IOError:
             time.sleep(10)
+
+
+def download_segmentation_wrapper(args):
+    """
+    :param args containing parameters (description, imagse_dir)
+    :param description: Json describing the image
+    :param dir: Directory in which to save the image
+    """
+    description, dir = args
+    download_segmentation(description, dir)
+
+
+def download_segmentation(description, dir):
+    # Get the id of the segmentation image
+    image_id = description['_id']
+    seg_desc_url = seg_id_url_prefix + image_id
+    seg_description = fetch_description(seg_desc_url)
+    seg_id = seg_description[0]['_id']
+    seg_img_url = seg_img_url_prefix + seg_id + seg_img_url_suffix
+    download_image(img_url=seg_img_url, img_name=description['name'], dir=dir, type='png')
 
 
 def validate_image(image_path):
