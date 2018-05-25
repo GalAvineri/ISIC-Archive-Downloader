@@ -44,17 +44,30 @@ Otherwise the download will run into errors.
 # Optional download abilities
 1. You can download a subset of the archive by specifying how many images you would like.  
 `python download_archive.py --num_images 1000`  
-If this option isn't present, the program will download all the available images.
+If this option isn't present, the program will download all the available images.  
+
 2. You can start downloading images from an offset.  
    `python download_archive.py --offset 100`  
-   This is useful for example if you would like to append upon a prior download.
+   This is useful for example if you would like to append upon a prior download.  
+   
 3. You can choose to download either only benign or malignant images.  
    `python download_archive.py --filter benign`  
    Note: If you would like k benign images instead of all the benign images, you could do  
    `python download_archive.py --num_images k --filter benign`
-4. You can change the default directories the images and the descriptions will be downloaded into.  
-`python download_archive.py --images-dir /Data/Images --descs-dir /Data/Descriptions`
-5. You can also change the default amount of processes that will work in parallel to download the archive.  
+   
+4. You can choose to download the segmentation of the images  
+   `pyton download_archive.py -s`  
+   and the directory which they will be downloaded to.  
+   `python download_archive.py -s --seg-dir /Data/Segmentations`  
+   
+5. You can choose not to download the lesion images.  
+   `python download_archive.py --no-images`  
+   This might be useful if you would like to download only the descriptions of segmentation images.
+   
+6. You can change the default directories the images and the descriptions will be downloaded into.  
+`python download_archive.py --images-dir /Data/Images --descs-dir /Data/Descriptions`  
+
+7. You can also change the default amount of processes that will work in parallel to download the archive.  
 `python download_archive.py --p 16`  
 But if you have no knowledge about this one, the default will be fine.
 
