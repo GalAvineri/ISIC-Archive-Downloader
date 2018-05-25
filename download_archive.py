@@ -178,11 +178,11 @@ def confirm_arguments(args):
 
     print('Use {0} processes to download the archive'.format(args.p))
 
-    res = input('Do you confirm your choices? [y/n] ')
+    res = input('Do you confirm your choices? [Y/n] ')
 
-    while res != 'y' and res != 'n':
+    while res not in ['y', '', 'n']:
         res = input('Invalid input. Do you confirm your choices? [y/n] ')
-    if res == 'y':
+    if res in ['y', '']:
         return True
     if res == 'n':
         return False
