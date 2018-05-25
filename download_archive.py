@@ -10,9 +10,8 @@ from itertools import repeat
 from tqdm import tqdm
 
 
-def main(num_images_requested, offset, segmentation, filter, images_dir, descs_dir, seg_dir, num_processes):
+def main(num_images_requested, offset, skip_images, segmentation, filter, images_dir, descs_dir, seg_dir, num_processes):
     # If any of the images dir and descs dir don't exist, create them
-    create_if_none(images_dir)
     create_if_none(descs_dir)
 
     if filter is None:
@@ -44,8 +43,10 @@ def main(num_images_requested, offset, segmentation, filter, images_dir, descs_d
                                                                           num_images_requested))
 
     # By this point we've got the description of only the required images
-    print('Downloading images')
-    download_images(descriptions=descriptions, images_dir=images_dir, num_processes=num_processes)
+    if not skip_images:
+        print('Downloading images')
+        create_if_none(images_dir)
+        download_images(descriptions=descriptions, images_dir=images_dir, num_processes=num_processes)
 
     if segmentation:
         print('Downloading segmentation')
@@ -90,7 +91,7 @@ def download_descriptions(ids: list, descs_dir: str, num_processes: int) -> list
     """
     # Split the download among multiple threads
     pool = ThreadPool(processes=num_processes)
-    descriptions = list(tqdm(pool.imap(download_description_wrapper, zip(ids, repeat(descs_dir))), total=len(ids), desc='Descriptions Downloaded'))
+    descriptions = list(tqdm(pool.imap(download_description_wrapper, zip(ids, repeat(descs_dir))), total=len(ids), desc='Downloading Descriptions'))
     return descriptions
 
 
@@ -144,35 +145,41 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
 def download_images(descriptions: list, images_dir: str, num_processes: int):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    list(tqdm(pool.imap(download_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Images Downloaded'))
+    list(tqdm(pool.imap(download_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Downloading Images'))
 
 
 def download_segmentations(descriptions, seg_dir, num_processes):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
     list(tqdm(pool.imap(download_segmentation_wrapper, zip(descriptions, repeat(seg_dir))), total=len(descriptions),
-         desc='Segmentations Downloaded'))
+         desc='Downloading Segmentations'))
 
 
 def confirm_arguments(args):
     print('You have decided to do the following:')
     if args.num_images is None:
-        print('Download all the available images')
+        print('Download all the available elements')
     else:
-        print('Download maximum of {0} images'.format(args.num_images))
+        print('Download maximum of {0} elements'.format(args.num_images))
+
+    if args.no_images:
+        print('Skip downloading the images')
 
     if args.segmentation:
-        print('Download segmentations as well')
+        print('Download the segmentation of the images')
 
     print('start with offset {0}'.format(args.offset))
 
     if args.filter:
         print('filter only {0} images'.format(args.filter))
     else:
-        print('Use no filter (only benign / only malignant)'.format(args.filter))
+        print('Use no filter (both benign and malignant)'.format(args.filter))
 
-    print('Images will be downloaded to ' + os.path.realpath(args.images_dir))
     print('Descriptions will be downloaded to ' + os.path.realpath(args.descs_dir))
+
+    if not args.no_images:
+        print('Images will be downloaded to ' + os.path.realpath(args.images_dir))
+
     if args.segmentation:
         print('Segmentations will be downloaded to ' + os.path.realpath(args.seg_dir))
 
@@ -190,10 +197,11 @@ def confirm_arguments(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_images', type=int, help='The number of images you would like to download from the ISIC Archive. '
+    parser.add_argument('--num-images', type=int, help='The number of images you would like to download from the ISIC Archive. '
                                                         'Leave empty to download all the available images', default=None)
     parser.add_argument('--offset', type=int, help='The offset of the image index from which to start downloading', default=0)
-    parser.add_argument('-s', '--segmentation', help='Whether to download the segmentation of the images as well', action="store_true")
+    parser.add_argument('--no-images', help='Whether to not download the images', action="store_true")
+    parser.add_argument('-s', '--segmentation', help='Whether to download the segmentation of the images', action="store_true")
     parser.add_argument('--filter', help='Indicates whether to download only benign or malignant images', choices=['benign', 'malignant'], default=None)
     parser.add_argument('--images-dir', help='The directory in which the images will be downloaded to',
                         default=join('Data', 'Images'))
@@ -209,7 +217,7 @@ if __name__ == '__main__':
     has_confirmed = confirm_arguments(args)
 
     if has_confirmed:
-        main(num_images_requested=args.num_images, offset=args.offset, segmentation=args.segmentation,
+        main(num_images_requested=args.num_images, offset=args.offset, skip_images=args.no_images, segmentation=args.segmentation,
              filter=args.filter, images_dir=args.images_dir, descs_dir=args.descs_dir, seg_dir=args.seg_dir,
              num_processes=args.p)
     else:
