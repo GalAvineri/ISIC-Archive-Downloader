@@ -17,6 +17,17 @@ seg_img_url_prefix = seg_url_prefix + '/'
 seg_img_url_suffix = '/mask?contentDisposition=inline'
 
 
+def imap_wrapper(args):
+    """
+    :param args: tuple of the form (func, f_arguments)
+    :return: result of func(**f_arguments)
+    """
+
+    func = args[0]
+    f_args = args[1:]
+    return func(*f_args)
+
+
 def download_image_description(id, descriptions_dir) -> list:
     """
 

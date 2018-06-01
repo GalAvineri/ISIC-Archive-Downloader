@@ -1,4 +1,4 @@
-from download_single_item import download_lesion_image, download_image_description, download_segmentation, \
+from download_single_item import imap_wrapper, download_lesion_image, download_image_description, download_segmentation, \
     fetch_img_description, save_description
 
 import argparse
@@ -92,7 +92,7 @@ def download_descriptions(ids: list, descs_dir: str, num_processes: int) -> list
     """
     # Split the download among multiple threads
     pool = ThreadPool(processes=num_processes)
-    descriptions = list(tqdm(pool.starmap(download_image_description, zip(ids, repeat(descs_dir))), total=len(ids), desc='Downloading Descriptions'))
+    descriptions = list(tqdm(pool.imap(imap_wrapper, zip(repeat(download_image_description), ids, repeat(descs_dir))), total=len(ids), desc='Downloading Descriptions'))
     return descriptions
 
 
@@ -145,15 +145,17 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
 
 def download_images(descriptions: list, images_dir: str, num_processes: int):
     # Split the download among multiple processes
-    pool = Pool(processes=num_processes)
-    list(tqdm(pool.starmap(download_lesion_image, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Downloading Images'))
+    pool = ThreadPool(processes=num_processes)
+    list(tqdm(pool.imap(imap_wrapper, zip(repeat(download_lesion_image), descriptions, repeat(images_dir))), total=len(descriptions),
+             desc='Downloading Images'))
 
 
 def download_segmentations(descriptions, seg_dir, num_processes):
     # Split the download among multiple processes
-    pool = Pool(processes=num_processes)
-    list(tqdm(pool.starmap(download_segmentation, zip(descriptions, repeat(seg_dir))), total=len(descriptions),
-         desc='Downloading Segmentations'))
+    pool = ThreadPool(processes=num_processes)
+    list(tqdm(pool.imap(imap_wrapper, zip(repeat(download_segmentation), descriptions, repeat(seg_dir))),
+              total=len(descriptions),
+              desc='Downloading Segmentations'))
 
 
 def confirm_arguments(args):
