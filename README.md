@@ -19,9 +19,10 @@ This script can download the entire ISIC archive ([or parts of it](#optional-dow
 all you have to do is run `python download_archive.py`
 
 # Requirements
-1.  requests  `pip install requests`
-2.  PIL  `pip install Pillow`
-3.  tqdm  `pip install tqdm`
+1. Python 3.X
+2.  requests  `pip install requests`
+3.  PIL  `pip install Pillow`
+4.  tqdm  `pip install tqdm`
 
 Or you could just `pip install -r requirements.txt`
 

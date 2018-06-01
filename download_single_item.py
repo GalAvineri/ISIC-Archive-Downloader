@@ -17,10 +17,6 @@ seg_img_url_prefix = seg_url_prefix + '/'
 seg_img_url_suffix = '/mask?contentDisposition=inline'
 
 
-def download_description_wrapper(args):
-    return download_image_description(*args)
-
-
 def download_image_description(id, descriptions_dir) -> list:
     """
 
@@ -97,14 +93,11 @@ def save_description(description, descriptions_dir):
         json.dump(description, descFile, indent=2)
 
 
-def download_image_wrapper(args):
+def download_lesion_image(description, dir):
     """
-    :param args containing parameters (description, imagse_dir)
     :param description: Json describing the image
     :param dir: Directory in which to save the image
     """
-    description, dir = args
-
     # Build the image url
     img_url = img_url_prefix + description['_id'] + img_url_suffix
 
@@ -146,17 +139,11 @@ def download_image(img_url, img_name, dir, type='jpg'):
             time.sleep(10)
 
 
-def download_segmentation_wrapper(args):
+def download_segmentation(description, dir):
     """
-    :param args containing parameters (description, imagse_dir)
     :param description: Json describing the image
     :param dir: Directory in which to save the image
     """
-    description, dir = args
-    download_segmentation(description, dir)
-
-
-def download_segmentation(description, dir):
     # Get the id of the segmentation image
     image_id = description['_id']
     seg_desc_url = seg_id_url_prefix + image_id

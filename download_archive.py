@@ -1,8 +1,9 @@
-from download_single_item import download_image_wrapper, download_description_wrapper, download_segmentation_wrapper, \
+from download_single_item import download_lesion_image, download_image_description, download_segmentation, \
     fetch_img_description, save_description
 
 import argparse
 import os
+import sys
 import requests
 from os.path import join
 from multiprocessing.pool import Pool, ThreadPool
@@ -10,7 +11,7 @@ from itertools import repeat
 from tqdm import tqdm
 
 
-def main(num_images_requested, offset, skip_images, segmentation, filter, images_dir, descs_dir, seg_dir, num_processes):
+def download_archive(num_images_requested, offset, skip_images, segmentation, filter, images_dir, descs_dir, seg_dir, num_processes):
     # If any of the images dir and descs dir don't exist, create them
     create_if_none(descs_dir)
 
@@ -20,7 +21,7 @@ def main(num_images_requested, offset, skip_images, segmentation, filter, images
 
         num_images_found = len(ids)
         if num_images_requested is None or num_images_found == num_images_requested:
-            print('Found {0} images'.format(num_images_requested))
+            print('Found {0} images'.format(num_images_found))
         else:
             print('Found {0} images and not the requested {1}'.format(num_images_found, num_images_requested))
 
@@ -49,7 +50,7 @@ def main(num_images_requested, offset, skip_images, segmentation, filter, images
         download_images(descriptions=descriptions, images_dir=images_dir, num_processes=num_processes)
 
     if segmentation:
-        print('Downloading segmentation')
+        print('Downloading segmentations')
         create_if_none(seg_dir)
         download_segmentations(descriptions=descriptions, seg_dir=seg_dir, num_processes=num_processes)
 
@@ -91,7 +92,7 @@ def download_descriptions(ids: list, descs_dir: str, num_processes: int) -> list
     """
     # Split the download among multiple threads
     pool = ThreadPool(processes=num_processes)
-    descriptions = list(tqdm(pool.imap(download_description_wrapper, zip(ids, repeat(descs_dir))), total=len(ids), desc='Downloading Descriptions'))
+    descriptions = list(tqdm(pool.starmap(download_image_description, zip(ids, repeat(descs_dir))), total=len(ids), desc='Downloading Descriptions'))
     return descriptions
 
 
@@ -145,13 +146,13 @@ def download_descriptions_and_filter(ids: list, num_images_requested: int, filte
 def download_images(descriptions: list, images_dir: str, num_processes: int):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    list(tqdm(pool.imap(download_image_wrapper, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Downloading Images'))
+    list(tqdm(pool.starmap(download_lesion_image, zip(descriptions, repeat(images_dir))), total=len(descriptions), desc='Downloading Images'))
 
 
 def download_segmentations(descriptions, seg_dir, num_processes):
     # Split the download among multiple processes
     pool = Pool(processes=num_processes)
-    list(tqdm(pool.imap(download_segmentation_wrapper, zip(descriptions, repeat(seg_dir))), total=len(descriptions),
+    list(tqdm(pool.starmap(download_segmentation, zip(descriptions, repeat(seg_dir))), total=len(descriptions),
          desc='Downloading Segmentations'))
 
 
@@ -195,30 +196,42 @@ def confirm_arguments(args):
         return False
 
 
-if __name__ == '__main__':
+def parse_args(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num-images', type=int, help='The number of images you would like to download from the ISIC Archive. '
-                                                        'Leave empty to download all the available images', default=None)
-    parser.add_argument('--offset', type=int, help='The offset of the image index from which to start downloading', default=0)
+    parser.add_argument('--num-images', type=int,
+                        help='The number of images you would like to download from the ISIC Archive. '
+                             'Leave empty to download all the available images', default=None)
+    parser.add_argument('--offset', type=int, help='The offset of the image index from which to start downloading',
+                        default=0)
     parser.add_argument('--no-images', help='Whether to not download the images', action="store_true")
-    parser.add_argument('-s', '--segmentation', help='Whether to download the segmentation of the images', action="store_true")
-    parser.add_argument('--filter', help='Indicates whether to download only benign or malignant images', choices=['benign', 'malignant'], default=None)
+    parser.add_argument('-s', '--segmentation', help='Whether to download the segmentation of the images',
+                        action="store_true")
+    parser.add_argument('--filter', help='Indicates whether to download only benign or malignant images',
+                        choices=['benign', 'malignant'], default=None)
     parser.add_argument('--images-dir', help='The directory in which the images will be downloaded to',
                         default=join('Data', 'Images'))
     parser.add_argument('--descs-dir', help='The directory in which the descriptions of '
                                             'the images will be downloaded to',
                         default=join('Data', 'Descriptions'))
     parser.add_argument('--seg-dir', help='The directory in which the segmentation of '
-                                            'the images will be downloaded to',
+                                          'the images will be downloaded to',
                         default=join('Data', 'Segmentation'))
     parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=16)
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args)
+    return parsed_args
 
+
+def main(args):
+    args = parse_args(args)
     has_confirmed = confirm_arguments(args)
 
     if has_confirmed:
-        main(num_images_requested=args.num_images, offset=args.offset, skip_images=args.no_images, segmentation=args.segmentation,
-             filter=args.filter, images_dir=args.images_dir, descs_dir=args.descs_dir, seg_dir=args.seg_dir,
-             num_processes=args.p)
+        download_archive(num_images_requested=args.num_images, offset=args.offset, skip_images=args.no_images, segmentation=args.segmentation,
+                         filter=args.filter, images_dir=args.images_dir, descs_dir=args.descs_dir, seg_dir=args.seg_dir,
+                         num_processes=args.p)
     else:
         print('Exiting without downloading anything')
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
