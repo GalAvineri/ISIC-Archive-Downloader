@@ -154,14 +154,21 @@ def download_segmentation(description, dir):
     """
     :param description: Json describing the image
     :param dir: Directory in which to save the image
+    :return Whether there was a segmentation for the requested image, and it was downloaded
+        successfully.
     """
     # Get the id of the segmentation image
     image_id = description['_id']
     seg_desc_url = seg_id_url_prefix + image_id
     seg_description = fetch_description(seg_desc_url)
+    # If there are no segmentation available for the image, do nothing
+    if len(seg_description) == 0:
+        return False
+    # Download the first available segmentation
     seg_id = seg_description[0]['_id']
     seg_img_url = seg_img_url_prefix + seg_id + seg_img_url_suffix
     download_image(img_url=seg_img_url, img_name=description['name'], dir=dir, type='png')
+    return True
 
 
 def validate_image(image_path):

@@ -153,9 +153,10 @@ def download_images(descriptions: list, images_dir: str, num_processes: int):
 def download_segmentations(descriptions, seg_dir, num_processes):
     # Split the download among multiple processes
     pool = ThreadPool(processes=num_processes)
-    list(tqdm(pool.imap(imap_wrapper, zip(repeat(download_segmentation), descriptions, repeat(seg_dir))),
+    res = list(tqdm(pool.imap(imap_wrapper, zip(repeat(download_segmentation), descriptions, repeat(seg_dir))),
               total=len(descriptions),
               desc='Downloading Segmentations'))
+    print('Out of the {0} requested segmentations, {1} were found'.format(len(descriptions), res.count(True)))
 
 
 def confirm_arguments(args):

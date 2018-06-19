@@ -85,7 +85,7 @@ So the basic portion of the script is:
 2. Build the urls by the given template
 3. Download the images and descriptions from the built urls
 
-# Note
+#### Note
 As mentioned above, we assume that the urls of the images and descriptions are built by a certain template.  
 If the template ever changes (and you start getting errors for example)  
 just let us know and we will change it accordingly :)  
