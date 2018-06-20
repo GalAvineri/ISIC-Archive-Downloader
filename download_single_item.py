@@ -115,17 +115,19 @@ def download_lesion_image(description, dir):
     download_image(img_url=img_url, img_name=description['name'], dir=dir)
 
 
-def download_image(img_url, img_name, dir, type='jpg'):
+def download_image(img_url, img_name, dir, type='jpg', max_tries=None):
     """
     Download the image from the given url and save it in the given dir,
     naming it using img_name with an jpg extension
     :param img_name:
     :param img_url: Url to download the image through
     :param dir: Directory in which to save the image
+    :return Whether the image was downloaded successfully
     """
     # Sometimes their site isn't responding well, and than an error occurs,
     # So we will retry 10 seconds later and repeat until it succeeds
-    while True:
+    tries = 0
+    while max_tries is None or tries <= max_tries:
         try:
             # print('Attempting to download image {0}'.format(img_name))
             response_image = requests.get(img_url, stream=True, timeout=20)
@@ -141,13 +143,12 @@ def download_image(img_url, img_name, dir, type='jpg'):
             validate_image(img_path)
 
             # print('Finished Downloading image {0}'.format(img_name))
-            return
-        except RequestException:
-            time.sleep(10)
-        except ReadTimeoutError:
-            time.sleep(10)
-        except IOError:
-            time.sleep(10)
+            return True
+        except (RequestException, ReadTimeoutError, IOError):
+            tries += 1
+            time.sleep(5)
+
+    return False
 
 
 def download_segmentation(description, dir):
@@ -167,8 +168,8 @@ def download_segmentation(description, dir):
     # Download the first available segmentation
     seg_id = seg_description[0]['_id']
     seg_img_url = seg_img_url_prefix + seg_id + seg_img_url_suffix
-    download_image(img_url=seg_img_url, img_name=description['name'], dir=dir, type='png')
-    return True
+    has_downloaded = download_image(img_url=seg_img_url, img_name=description['name'], dir=dir, type='png', max_tries=5)
+    return has_downloaded
 
 
 def validate_image(image_path):
