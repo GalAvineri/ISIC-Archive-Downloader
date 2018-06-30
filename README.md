@@ -30,11 +30,16 @@ Or you could just `pip install -r requirements.txt`
 1.  download or clone the repository
 2.  run download_archive.py `python download_archive.py`
 
-#### Note
-By default if you call the script in the following way:  
-`python <root>/.../download_archive.py`  
-the images will be download to \<root\>/Data/Images  
-and the descriptions will be downloaded to \<root\>/Data/Descriptions
+#### Notes
+1.  By default if you call the script in the following way:  
+    `python <root>/.../download_archive.py`  
+    images will be download to \<root\>/Data/Images  
+    their descriptions will be downloaded to \<root\>/Data/Descriptions
+    
+2.  In case you choose to download segmentations of images,
+    Note that some images have multiple segmentations of different expertise levels.
+    This script currently downloads one in random, and unnecessarily one of the highest
+    expertise.
 
 
 #### Warnings
@@ -59,7 +64,7 @@ If this option isn't present, the program will download all the available images
 4. You can choose to download the segmentation of the images  
    `pyton download_archive.py -s`  
    and the directory which they will be downloaded to.  
-   `python download_archive.py -s --seg-dir /Data/Segmentations`  
+   `python download_archive.py -s --seg-dir /Data/Segmentations`
    
 5. You can choose not to download the lesion images.  
    `python download_archive.py --no-images`  
@@ -85,7 +90,7 @@ So the basic portion of the script is:
 2. Build the urls by the given template
 3. Download the images and descriptions from the built urls
 
-#### Note
+##### Note
 As mentioned above, we assume that the urls of the images and descriptions are built by a certain template.  
 If the template ever changes (and you start getting errors for example)  
 just let us know and we will change it accordingly :)  
