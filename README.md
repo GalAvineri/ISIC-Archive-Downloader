@@ -49,7 +49,7 @@ Otherwise the download will run into errors.
 
 # Optional download abilities
 1. You can download a subset of the archive by specifying how many images you would like.  
-`python download_archive.py --num_images 1000`  
+`python download_archive.py --num-images 1000`  
 If this option isn't present, the program will download all the available images.  
 
 2. You can start downloading images from an offset.  
@@ -59,7 +59,7 @@ If this option isn't present, the program will download all the available images
 3. You can choose to download either only benign or malignant images.  
    `python download_archive.py --filter benign`  
    Note: If you would like k benign images instead of all the benign images, you could do  
-   `python download_archive.py --num_images k --filter benign`
+   `python download_archive.py --num-images k --filter benign`
    
 4. You can choose to download the segmentation of the images  
    `pyton download_archive.py -s`  
