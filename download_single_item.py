@@ -137,7 +137,7 @@ class LesionImageDownloader():
 
 class SegmentationDownloader:
     url_prefix: str = 'https://isic-archive.com/api/v1/segmentation'
-    id_url_prefix: str = url_prefix + '?limit=1&sort=created&sortdir=-1&imageId='
+    id_url_prefix: str = url_prefix + '?limit=0&imageId='
     img_url_prefix: str = url_prefix + '/'
     img_url_suffix: str = '/mask?contentDisposition=inline'
 
