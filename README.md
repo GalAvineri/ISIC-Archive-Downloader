@@ -64,7 +64,15 @@ If this option isn't present, the program will download all the available images
 4. You can choose to download the segmentation of the images  
    `pyton download_archive.py -s`  
    and the directory which they will be downloaded to.  
-   `python download_archive.py -s --seg-dir /Data/Segmentations`
+   `python download_archive.py -s --seg-dir /Data/Segmentations`  
+   Some images have multiple segmentations offered, made with different skill level.
+   You can choose a preferred skill level (e.g expert).  
+   `python download_archive.py -s --seg-level novice`  
+   That means that, when available, the script will download a segmentation with the preferred
+   skill level.  
+   Note: It has been suggested that sometimes segmentations tagged as 'novice' skill are more accurate
+   than there 'expert' alternative. So perhaps relying the the 'expert' segmentations are always better
+   can be incorrect.   
    
 5. You can choose not to download the lesion images.  
    `python download_archive.py --no-images`  
