@@ -144,9 +144,15 @@ class SegmentationDownloader:
     @classmethod
     def download_image(cls, lesion_desc, dir, skill_pref):
         """
+        Downloads a segmentation for a lesion image, if available.
+        If skill_pref is not None, and a segmentation is of the preferred skill level is available,
+        it will be downloaded.
+        If a segmentation of the preferred skill level is not available, the method will download
+        the first segmentation available.
+
         :param lesion_desc: Json describing the lesion image
         :param dir: Directory in which to save the image
-        :param skill_pref: Preferred skill of segmentation
+        :param skill_pref: Preferred skill of segmentation.
         :return Whether there was a segmentation for the requested image, and it was downloaded
             successfully.
         """
@@ -157,18 +163,15 @@ class SegmentationDownloader:
         # If there are no segmentation available for the image, do nothing
         if len(seg_desc) == 0:
             return False
-        # If there's a segmentation with the preffered skill level, pick it.
-        chosen_seg_id = None
-        skill_level = None
-        for seg in seg_desc:
-            seg_id, seg_skill = seg['_id'], seg['skill']
-            if seg_skill == skill_pref:
-                chosen_seg_id = seg_id
-                skill_level = skill_pref
-        # If no segmentation matches the preferred skill level, pick the first available segmentation
-        if chosen_seg_id is None:
-            chosen_seg_id = seg_desc[0]['_id']
-            skill_level = seg_desc[0]['skill']
+        seg_index = 0
+        if skill_pref is not None:
+            # If there's a segmentation with the preffered skill level, pick it.
+            for index, seg in enumerate(seg_desc):
+                seg_id, seg_skill = seg['_id'], seg['skill']
+                if seg_skill == skill_pref:
+                    seg_index = index
+        chosen_seg_id = seg_desc[seg_index]['_id']
+        skill_level = seg_desc[seg_index]['skill']
         # Download the segmentation
         seg_img_url = cls.img_url_prefix + chosen_seg_id + cls.img_url_suffix
         has_downloaded = BasicElementDownloader.download_img(img_url=seg_img_url, img_name='{}_{}'.format(lesion_desc['name'], skill_level) , dir=dir, type='png',

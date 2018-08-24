@@ -194,7 +194,10 @@ def confirm_arguments(args):
 
     if args.segmentation:
         print('Segmentations will be downloaded to ' + os.path.realpath(args.seg_dir))
-        print('Preferred segmentation skill level is ' + args.seg_skill)
+        if args.seg_skill is not None:
+            print('Preferred segmentation skill level is ' + args.seg_skill)
+        else:
+            print('There is no preferred segmentation skill')
 
     print('Use {0} processes to download the archive'.format(args.p))
 
@@ -229,7 +232,7 @@ def parse_args(args):
                                           'the images will be downloaded to',
                         default=join('Data', 'Segmentation'))
     parser.add_argument('--seg-skill', help='The preffered skill level of the segmentations (novice \ expert)',
-                        default='expert', choices=['novice', 'expert'])
+                        default=None, choices=['novice', 'expert'])
     parser.add_argument('--p', type=int, help='The number of processes to use in parallel', default=16)
     parsed_args = parser.parse_args(args)
     return parsed_args
