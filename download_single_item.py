@@ -7,175 +7,170 @@ from requests.exceptions import RequestException
 import json
 from PIL import Image
 
-# The url template for the image is <base url prefix><image id><base url suffix>
-# The url template for the description of the image is: <base url prefix><image id>
-img_url_prefix = 'https://isic-archive.com/api/v1/image/'
-img_url_suffix = '/download?contentDisposition=inline'
-seg_url_prefix = 'https://isic-archive.com/api/v1/segmentation'
-seg_id_url_prefix = seg_url_prefix + '?limit=1&sort=created&sortdir=-1&imageId='
-seg_img_url_prefix = seg_url_prefix + '/'
-seg_img_url_suffix = '/mask?contentDisposition=inline'
 
+class BasicElementDownloader:
+    @classmethod
+    def download_img(cls, img_url, img_name, dir, type='jpg', max_tries=None):
+        """
+        Download the image from the given url and save it in the given dir,
+        naming it using img_name with an jpg extension
+        :param img_name:
+        :param img_url: Url to download the image through
+        :param dir: Directory in which to save the image
+        :return Whether the image was downloaded successfully
+        """
+        # Sometimes their site isn't responding well, and than an error occurs,
+        # So we will retry a few seconds later and repeat until it succeeds
+        tries = 0
+        while max_tries is None or tries <= max_tries:
+            try:
+                # print('Attempting to download image {0}'.format(img_name))
+                response_image = requests.get(img_url, stream=True, timeout=20)
+                # Validate the download status is ok
+                response_image.raise_for_status()
 
-def imap_wrapper(args):
-    """
-    :param args: tuple of the form (func, f_arguments)
-    :return: result of func(**f_arguments)
-    """
+                # Write the image into a file
+                img_path = join(dir, '{0}.{1}'.format(img_name, type))
+                with open(img_path, 'wb') as imageFile:
+                    shutil.copyfileobj(response_image.raw, imageFile)
 
-    func = args[0]
-    f_args = args[1:]
-    return func(*f_args)
+                # Validate the image was downloaded correctly
+                cls.validate_image(img_path)
 
+                # print('Finished Downloading image {0}'.format(img_name))
+                return True
+            except (RequestException, ReadTimeoutError, IOError):
+                tries += 1
+                time.sleep(5)
 
-def download_image_description(id, descriptions_dir) -> list:
-    """
-
-    :param id: Id of the image whose description will be downloaded
-    :param descriptions_dir:
-    :return: Json
-    """
-    desc_url = img_url_prefix + id
-    description = fetch_description(desc_url)
-    save_description(description, descriptions_dir)
-    return description
-
-
-def fetch_description(url : str) -> list:
-    """
-
-    :param id: Id of the image whose description will be downloaded
-    :return: Json
-    """
-    # Sometimes their site isn't responding well, and than an error occurs,
-    # So we will retry 10 seconds later and repeat until it succeeds
-    while True:
-        try:
-            # Download the description
-            response_desc = requests.get(url, stream=True, timeout=20)
-            # Validate the download status is ok
-            response_desc.raise_for_status()
-            # Parse the description
-            parsed_description = response_desc.json()
-            return parsed_description
-        except RequestException:
-            time.sleep(10)
-        except ReadTimeoutError:
-            time.sleep(10)
-        except IOError:
-            time.sleep(10)
-
-
-def fetch_img_description(id : str) -> list:
-    """
-
-    :param id: Id of the image whose description will be downloaded
-    :return: Json
-    """
-    # Sometimes their site isn't responding well, and than an error occurs,
-    # So we will retry 10 seconds later and repeat until it succeeds
-    url = img_url_prefix + id
-    while True:
-        try:
-            # Download the description
-            response_desc = requests.get(url, stream=True, timeout=20)
-            # Validate the download status is ok
-            response_desc.raise_for_status()
-            # Parse the description
-            parsed_description = response_desc.json()
-            return parsed_description
-        except RequestException:
-            time.sleep(10)
-        except ReadTimeoutError:
-            time.sleep(10)
-        except IOError:
-            time.sleep(10)
-
-
-def save_description(description, descriptions_dir):
-    """
-
-    :param description: Json
-    :param descriptions_dir:
-    :return:
-    """
-    desc_path = join(descriptions_dir, description['name'])
-    with open(desc_path, 'w') as descFile:
-        json.dump(description, descFile, indent=2)
-
-
-def download_lesion_image(description, dir):
-    """
-    :param description: Json describing the image
-    :param dir: Directory in which to save the image
-    """
-    # Build the image url
-    img_url = img_url_prefix + description['_id'] + img_url_suffix
-
-    download_image(img_url=img_url, img_name=description['name'], dir=dir)
-
-
-def download_image(img_url, img_name, dir, type='jpg', max_tries=None):
-    """
-    Download the image from the given url and save it in the given dir,
-    naming it using img_name with an jpg extension
-    :param img_name:
-    :param img_url: Url to download the image through
-    :param dir: Directory in which to save the image
-    :return Whether the image was downloaded successfully
-    """
-    # Sometimes their site isn't responding well, and than an error occurs,
-    # So we will retry 10 seconds later and repeat until it succeeds
-    tries = 0
-    while max_tries is None or tries <= max_tries:
-        try:
-            # print('Attempting to download image {0}'.format(img_name))
-            response_image = requests.get(img_url, stream=True, timeout=20)
-            # Validate the download status is ok
-            response_image.raise_for_status()
-
-            # Write the image into a file
-            img_path = join(dir, '{0}.{1}'.format(img_name, type))
-            with open(img_path, 'wb') as imageFile:
-                shutil.copyfileobj(response_image.raw, imageFile)
-
-            # Validate the image was downloaded correctly
-            validate_image(img_path)
-
-            # print('Finished Downloading image {0}'.format(img_name))
-            return True
-        except (RequestException, ReadTimeoutError, IOError):
-            tries += 1
-            time.sleep(5)
-
-    return False
-
-
-def download_segmentation(description, dir):
-    """
-    :param description: Json describing the image
-    :param dir: Directory in which to save the image
-    :return Whether there was a segmentation for the requested image, and it was downloaded
-        successfully.
-    """
-    # Get the id of the segmentation image
-    image_id = description['_id']
-    seg_desc_url = seg_id_url_prefix + image_id
-    seg_description = fetch_description(seg_desc_url)
-    # If there are no segmentation available for the image, do nothing
-    if len(seg_description) == 0:
         return False
-    # Download the first available segmentation
-    seg_id = seg_description[0]['_id']
-    seg_img_url = seg_img_url_prefix + seg_id + seg_img_url_suffix
-    has_downloaded = download_image(img_url=seg_img_url, img_name=description['name'], dir=dir, type='png', max_tries=5)
-    return has_downloaded
+
+    @staticmethod
+    def fetch_description(url: str) -> list:
+        """
+
+        :param id: Id of the image whose description will be downloaded
+        :return: Json
+        """
+        # Sometimes their site isn't responding well, and than an error occurs,
+        # So we will retry 10 seconds later and repeat until it succeeds
+        while True:
+            try:
+                # Download the description
+                response_desc = requests.get(url, stream=True, timeout=20)
+                # Validate the download status is ok
+                response_desc.raise_for_status()
+                # Parse the description
+                parsed_description = response_desc.json()
+                return parsed_description
+            except (RequestException, ReadTimeoutError):
+                time.sleep(5)
+
+    @staticmethod
+    def save_description(desc, dir):
+        """
+
+        :param desc: Json
+        :param dir:
+        :return:
+        """
+        desc_path = join(dir, desc['name'])
+        with open(desc_path, 'w') as descFile:
+            json.dump(desc, descFile, indent=2)
+
+    @classmethod
+    def download_description(cls, url: str, dir: str) -> list:
+        desc = cls.fetch_description(url)
+        cls.save_description(desc, dir)
+
+    @staticmethod
+    def validate_image(image_path):
+        # We would like to validate the image was fully downloaded and wasn't truncated.
+        # To do so, we can open the image file using PIL.Image and try to resize it to the size
+        # the file declares it has.
+        # If the image wasn't fully downloaded and was truncated - an error will be raised.
+        img = Image.open(image_path)
+        img.resize(img.size)
 
 
-def validate_image(image_path):
-    # We would like to validate the image was fully downloaded and wasn't truncated.
-    # To do so, we can open the image file using PIL.Image and try to resize it to the size
-    # the file declares it has.
-    # If the image wasn't fully downloaded and was truncated - an error will be raised.
-    img = Image.open(image_path)
-    img.resize(img.size)
+class LesionImageDownloader():
+    url_prefix: str = 'https://isic-archive.com/api/v1/image/'
+    url_suffix: str = '/download?contentDisposition=inline'
+
+    @classmethod
+    def download_image(cls, desc, dir):
+        """
+        :param desc: Json describing the image
+        :param dir: Directory in which to save the image
+        """
+        # Build the image url
+        img_url = cls.url_prefix + desc['_id'] + cls.url_suffix
+
+        BasicElementDownloader.download_img(img_url=img_url, img_name=desc['name'], dir=dir)
+
+    @classmethod
+    def fetch_img_description(cls, id: str) -> list:
+        """
+
+        :param id: Id of the image whose description will be downloaded
+        :return: Json
+        """
+        url = cls.url_prefix + id
+        return BasicElementDownloader.fetch_description(url)
+
+    @classmethod
+    def save_img_description(cls, desc, dir):
+        BasicElementDownloader.save_description(desc, dir)
+
+    @classmethod
+    def download_image_description(cls, id, dir) -> list:
+        """
+
+        :param id: Id of the image whose description will be downloaded
+        :param dir:
+        :return: Json
+        """
+        desc = cls.fetch_img_description(id)
+        BasicElementDownloader.save_description(desc, dir)
+        return desc
+
+
+class SegmentationDownloader:
+    url_prefix: str = 'https://isic-archive.com/api/v1/segmentation'
+    id_url_prefix: str = url_prefix + '?limit=1&sort=created&sortdir=-1&imageId='
+    img_url_prefix: str = url_prefix + '/'
+    img_url_suffix: str = '/mask?contentDisposition=inline'
+
+    @classmethod
+    def download_image(cls, lesion_desc, dir, skill_pref):
+        """
+        :param lesion_desc: Json describing the lesion image
+        :param dir: Directory in which to save the image
+        :param skill_pref: Preferred skill of segmentation
+        :return Whether there was a segmentation for the requested image, and it was downloaded
+            successfully.
+        """
+        # Get the id of the segmentation image
+        image_id = lesion_desc['_id']
+        seg_desc_url = cls.id_url_prefix + image_id
+        seg_desc = BasicElementDownloader.fetch_description(seg_desc_url)
+        # If there are no segmentation available for the image, do nothing
+        if len(seg_desc) == 0:
+            return False
+        # If there's a segmentation with the preffered skill level, pick it.
+        chosen_seg_id = None
+        skill_level = None
+        for seg in seg_desc:
+            seg_id, seg_skill = seg['_id'], seg['skill']
+            if seg_skill == skill_pref:
+                chosen_seg_id = seg_id
+                skill_level = skill_pref
+        # If no segmentation matches the preferred skill level, pick the first available segmentation
+        if chosen_seg_id is None:
+            chosen_seg_id = seg_desc[0]['_id']
+            skill_level = seg_desc[0]['skill']
+        # Download the segmentation
+        seg_img_url = cls.img_url_prefix + chosen_seg_id + cls.img_url_suffix
+        has_downloaded = BasicElementDownloader.download_img(img_url=seg_img_url, img_name='{}_{}'.format(lesion_desc['name'], skill_level) , dir=dir, type='png',
+                                        max_tries=5)
+        return has_downloaded
