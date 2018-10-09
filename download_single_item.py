@@ -123,6 +123,16 @@ class LesionImageDownloader():
         BasicElementDownloader.save_description(desc, dir)
 
     @classmethod
+    def save_description(self,desc, dir) -> list:
+        """
+
+        :param desc: Json
+        :param dir:
+        :return:
+        """
+        return BasicElementDownloader.save_description(desc, dir)
+
+    @classmethod
     def download_image_description(cls, id, dir) -> list:
         """
 
