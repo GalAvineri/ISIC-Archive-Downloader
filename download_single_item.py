@@ -30,11 +30,11 @@ class BasicElementDownloader:
                 # Validate the download status is ok
                 response.raise_for_status()
 
-                image_string = response.raw
-                # Determine the format of the image
-                format = imghdr.what(None, h=image_string)
+                # Find the format of the image
+                format = response.headers['Content-Type'].split('/')[1]
 
                 # Write the image into a file
+                image_string = response.raw
                 img_path = join(dir, '{0}.{1}'.format(img_name, format))
                 with open(img_path, 'wb') as imageFile:
                     shutil.copyfileobj(image_string, imageFile)
