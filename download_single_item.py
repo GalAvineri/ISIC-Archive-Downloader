@@ -6,11 +6,12 @@ from urllib3.exceptions import ReadTimeoutError
 from requests.exceptions import RequestException
 import json
 from PIL import Image
+import imghdr
 
 
 class BasicElementDownloader:
     @classmethod
-    def download_img(cls, img_url, img_name, dir, type='jpg', max_tries=None):
+    def download_img(cls, img_url, img_name, dir, max_tries=None):
         """
         Download the image from the given url and save it in the given dir,
         naming it using img_name with an jpg extension
@@ -25,14 +26,18 @@ class BasicElementDownloader:
         while max_tries is None or tries <= max_tries:
             try:
                 # print('Attempting to download image {0}'.format(img_name))
-                response_image = requests.get(img_url, stream=True, timeout=20)
+                response = requests.get(img_url, stream=True, timeout=20)
                 # Validate the download status is ok
-                response_image.raise_for_status()
+                response.raise_for_status()
+
+                image_string = response.raw
+                # Determine the format of the image
+                format = imghdr.what(None, h=image_string)
 
                 # Write the image into a file
-                img_path = join(dir, '{0}.{1}'.format(img_name, type))
+                img_path = join(dir, '{0}.{1}'.format(img_name, format))
                 with open(img_path, 'wb') as imageFile:
-                    shutil.copyfileobj(response_image.raw, imageFile)
+                    shutil.copyfileobj(image_string, imageFile)
 
                 # Validate the image was downloaded correctly
                 cls.validate_image(img_path)
@@ -89,7 +94,7 @@ class BasicElementDownloader:
         # To do so, we can open the image file using PIL.Image and try to resize it to the size
         # the file declares it has.
         # If the image wasn't fully downloaded and was truncated - an error will be raised.
-        img = Image.open(image_path)
+        img : Image.Image = Image.open(image_path)
         img.resize(img.size)
 
 
@@ -184,6 +189,7 @@ class SegmentationDownloader:
         skill_level = seg_desc[seg_index]['skill']
         # Download the segmentation
         seg_img_url = cls.img_url_prefix + chosen_seg_id + cls.img_url_suffix
-        has_downloaded = BasicElementDownloader.download_img(img_url=seg_img_url, img_name='{}_{}'.format(lesion_desc['name'], skill_level) , dir=dir, type='png',
-                                        max_tries=5)
+        has_downloaded = BasicElementDownloader.download_img(img_url=seg_img_url,
+                                                             img_name='{}_{}'.format(lesion_desc['name'], skill_level),
+                                                             dir=dir, max_tries=5)
         return has_downloaded
