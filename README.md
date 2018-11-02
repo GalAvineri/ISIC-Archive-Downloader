@@ -65,7 +65,7 @@ If this option isn't present, the program will download all the available images
    `pyton download_archive.py -s`  
    and the directory which they will be downloaded to.  
    `python download_archive.py -s --seg-dir /Data/Segmentations`  
-   Some images have multiple segmentations offered, made with different skill level.
+   Some images have multiple segmentations offered, made with different skill level.  
    You can choose a preferred skill level (e.g expert).  
    `python download_archive.py -s --seg-level novice`  
    That means that, when available, the script will download a segmentation with the preferred
