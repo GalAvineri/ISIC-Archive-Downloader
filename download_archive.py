@@ -189,7 +189,9 @@ def confirm_arguments(args):
 
     print('Descriptions will be downloaded to ' + os.path.realpath(args.descs_dir))
 
-    if not args.no_images:
+    if args.no_images:
+        print('No lesion images will be downloaded')
+    else:
         print('Images will be downloaded to ' + os.path.realpath(args.images_dir))
 
     if args.segmentation:
