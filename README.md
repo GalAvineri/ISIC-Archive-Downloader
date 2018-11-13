@@ -1,7 +1,7 @@
 # ISIC Archive Downloader
 The ISIC Archive contains over 23k images of skin lesions, labeled as 'benign' or 'malignant'.  
 The archive can be found here:
-https://isic-archive.com/#images
+https://www.isic-archive.com/#!/onlyHeaderTop/gallery
 
 The current ways to download the archive, provided by the ISIC foundation and which are known to me, are the following:
 1. Download the entire archive via the direct download button on their website.
