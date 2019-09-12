@@ -62,7 +62,7 @@ If this option isn't present, the program will download all the available images
    `python download_archive.py --num-images k --filter benign`
    
 4. You can choose to download the segmentation of the images  
-   `pyton download_archive.py -s`  
+   `python download_archive.py -s`  
    and the directory which they will be downloaded to.  
    `python download_archive.py -s --seg-dir /Data/Segmentations`  
    Some images have multiple segmentations offered, made with different skill level.  
