@@ -1,3 +1,7 @@
+## Note
+Kaggle now offers a [competition](https://www.kaggle.com/c/siim-isic-melanoma-classification) regarding the isic archive, and it appears to have a larger dataset than the one provided in the isic archive website.
+In addition the discussion threads hold useful information about the data itself (e.g about existing duplicate images).
+
 # ISIC Archive Downloader
 The ISIC Archive contains over 23k images of skin lesions, labeled as 'benign' or 'malignant'.  
 The archive can be found here:
