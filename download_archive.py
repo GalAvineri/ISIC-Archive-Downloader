@@ -1,4 +1,5 @@
 from download_single_item import LesionImageDownloader as ImgDownloader, SegmentationDownloader as SegDownloader
+from auxiliaries import create_if_none, imap_wrapper
 
 import argparse
 import os
@@ -52,22 +53,6 @@ def download_archive(num_images_requested, offset, skip_images, segmentation, fi
         download_segmentations(descriptions=descriptions, seg_dir=seg_dir, seg_skill=seg_skill, num_processes=num_processes)
 
     print('Finished downloading')
-
-
-def create_if_none(dir_path):
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-
-
-def imap_wrapper(args):
-    """
-    :param args: tuple of the form (func, f_arguments)
-    :return: result of func(**f_arguments)
-    """
-
-    func = args[0]
-    f_args = args[1:]
-    return func(*f_args)
 
 
 def get_images_ids(num_images, offset):
