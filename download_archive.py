@@ -180,7 +180,7 @@ def confirm_arguments(args):
     if args.segmentation:
         print('Download the segmentation of the images')
 
-    print('start with offset {0}'.format(args.offset))
+    print('start with offset {0}, end with offset {1}'.format(args.offset, args.offset + args.num_images - 1))
 
     if args.filter:
         print('filter only {0} images'.format(args.filter))
